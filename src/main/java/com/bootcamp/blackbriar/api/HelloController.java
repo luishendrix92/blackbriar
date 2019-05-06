@@ -1,4 +1,4 @@
-package com.bootcamp.blackbriar;
+package com.bootcamp.blackbriar.api;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,9 +12,9 @@ public class HelloController {
   public List<String> index() {
     List<String> things = new ArrayList<>();
 
-    things.add("Hola");
-    things.add("Mundo");
+    things.add("Hello");
     things.add("Cruel");
+    things.add("World!");
 
     return things;
   }
