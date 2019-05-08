@@ -1,1 +1,1 @@
-        RESTFUL api
+        RESTFUL api auth
