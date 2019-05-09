@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
@@ -20,16 +21,22 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
+    AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager());
+
+    authenticationFilter.setFilterProcessesUrl("/api/users/login");
+
     http
       .csrf()
         .disable()
       .authorizeRequests()
       .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
         .permitAll()
+      .antMatchers(HttpMethod.GET, "/")
+        .permitAll()
       .anyRequest()
         .authenticated()
       .and()
-      .addFilter(new AuthenticationFilter(authenticationManager()))
+      .addFilter(authenticationFilter)
       .addFilter(new AuthorizationFilter(authenticationManager()));
   }
 
