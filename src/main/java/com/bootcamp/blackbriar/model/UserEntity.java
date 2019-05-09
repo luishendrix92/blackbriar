@@ -1,5 +1,7 @@
 package com.bootcamp.blackbriar.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,6 +31,7 @@ public class UserEntity implements Serializable {
   @Column(nullable = false, length = 100)
   private String photo;
 
+  //@JsonIgnore
   @Column(nullable = false)
   private String encryptedPassword;
 
