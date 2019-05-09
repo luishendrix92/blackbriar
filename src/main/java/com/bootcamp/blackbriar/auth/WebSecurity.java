@@ -1,11 +1,13 @@
 package com.bootcamp.blackbriar.auth;
 
 import com.bootcamp.blackbriar.business.UserService;
+import com.mysql.cj.Session;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -23,21 +25,27 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager());
 
-    authenticationFilter.setFilterProcessesUrl("/api/users/login");
+    authenticationFilter.setFilterProcessesUrl(SecurityConstants.SIGN_IN_URL);
 
     http
       .csrf()
         .disable()
       .authorizeRequests()
-      .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
+      .antMatchers(
+        HttpMethod.POST,
+        SecurityConstants.SIGN_UP_URL,
+        SecurityConstants.SIGN_IN_URL
+      )
         .permitAll()
-      .antMatchers(HttpMethod.GET, "/")
-        .permitAll()
-      .anyRequest()
+      .antMatchers("/api/**")
         .authenticated()
+      .anyRequest()
+        .permitAll()
       .and()
       .addFilter(authenticationFilter)
-      .addFilter(new AuthorizationFilter(authenticationManager()));
+      .addFilter(new AuthorizationFilter(authenticationManager()))
+      .sessionManagement()
+      .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
   }
 
   @Override

@@ -3675,7 +3675,7 @@ var wrapFn = function (event) {
     var target = this || event.target || _global;
     var listener = target[eventNameSymbol];
     var result;
-    if (isBrowser && target === internalWindow && event.type === 'error') {
+    if (isBrowser && target === internalWindow && event.type === 'error.jsp') {
         // window.onerror have different signiture
         // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#window.onerror
         // and onerror callback will prevent default when callback return true
@@ -4893,7 +4893,7 @@ function apply(api, _global) {
             // we can patch the real socket
             proxySocket = socket;
         }
-        patchOnProperties(proxySocket, ['close', 'error', 'message', 'open'], proxySocketProto);
+        patchOnProperties(proxySocket, ['close', 'error.jsp', 'message', 'open'], proxySocketProto);
         return proxySocket;
     };
     var globalWebSocket = _global['WebSocket'];
@@ -4944,7 +4944,7 @@ var globalEventHandlersEventNames = [
     'durationchange',
     'emptied',
     'ended',
-    'error',
+    'error.jsp',
     'focus',
     'focusin',
     'focusout',
@@ -5116,15 +5116,15 @@ var webglEventNames = ['webglcontextrestored', 'webglcontextlost', 'webglcontext
 var formEventNames = ['autocomplete', 'autocompleteerror'];
 var detailEventNames = ['toggle'];
 var frameEventNames = ['load'];
-var frameSetEventNames = ['blur', 'error', 'focus', 'load', 'resize', 'scroll', 'messageerror'];
+var frameSetEventNames = ['blur', 'error.jsp', 'focus', 'load', 'resize', 'scroll', 'messageerror'];
 var marqueeEventNames = ['bounce', 'finish', 'start'];
 var XMLHttpRequestEventNames = [
-    'loadstart', 'progress', 'abort', 'error', 'load', 'progress', 'timeout', 'loadend',
+    'loadstart', 'progress', 'abort', 'error.jsp', 'load', 'progress', 'timeout', 'loadend',
     'readystatechange'
 ];
-var IDBIndexEventNames = ['upgradeneeded', 'complete', 'abort', 'success', 'error', 'blocked', 'versionchange', 'close'];
-var websocketEventNames = ['close', 'error', 'open', 'message'];
-var workerEventNames = ['error', 'message'];
+var IDBIndexEventNames = ['upgradeneeded', 'complete', 'abort', 'success', 'error.jsp', 'blocked', 'versionchange', 'close'];
+var websocketEventNames = ['close', 'error.jsp', 'open', 'message'];
+var workerEventNames = ['error.jsp', 'message'];
 var eventNames = globalEventHandlersEventNames.concat(webglEventNames, formEventNames, detailEventNames, documentEventNames, windowEventNames, htmlElementEventNames, ieElementEventNames);
 function filterProperties(target, onProperties, ignoreProperties) {
     if (!ignoreProperties || ignoreProperties.length === 0) {
@@ -5156,7 +5156,7 @@ function propertyDescriptorPatch(api, _global) {
         // for browsers that we can patch the descriptor:  Chrome & Firefox
         if (isBrowser) {
             var internalWindow = window;
-            var ignoreErrorProperties = isIE ? [{ target: internalWindow, ignoreProperties: ['error'] }] : [];
+            var ignoreErrorProperties = isIE ? [{ target: internalWindow, ignoreProperties: ['error.jsp'] }] : [];
             // in IE/Edge, onProp not exist in window object, but in WindowPrototype
             // so we need to pass WindowPrototype to check onProp exist or not
             patchFilteredProperties(internalWindow, eventNames.concat(['messageerror']), ignoreProperties ? ignoreProperties.concat(ignoreErrorProperties) : ignoreProperties, ObjectGetPrototypeOf(internalWindow));

@@ -11749,7 +11749,7 @@ function toBase64Digit(value) {
 var _SINGLE_QUOTE_ESCAPE_STRING_RE = /'|\\|\n|\r|\$/g;
 var _LEGAL_IDENTIFIER_RE = /^[$A-Z_][0-9A-Z_$]*$/i;
 var _INDENT_WITH = '  ';
-var CATCH_ERROR_VAR$1 = variable('error', null, null);
+var CATCH_ERROR_VAR$1 = variable('error.jsp', null, null);
 var CATCH_STACK_VAR$1 = variable('stack', null, null);
 var _EmittedLine = /** @class */ (function () {
     function _EmittedLine(indent) {
@@ -25033,7 +25033,7 @@ var CompileMetadataResolver = /** @class */ (function () {
             // Directive
             if (!selector) {
                 this._reportError(syntaxError("Directive " + stringifyType(directiveType) + " has no selector, please add it!"), directiveType);
-                selector = 'error';
+                selector = 'error.jsp';
             }
         }
         var providers = [];
@@ -29595,7 +29595,7 @@ var StaticSymbolResolver = /** @class */ (function () {
                         filePath = self.resolveModule(module, sourceSymbol.filePath);
                         if (!filePath) {
                             return {
-                                __symbolic: 'error',
+                                __symbolic: 'error.jsp',
                                 message: "Could not resolve " + module + " relative to " + self.host.getMetadataFor(sourceSymbol.filePath) + ".",
                                 line: map['line'],
                                 character: map['character'],
@@ -29620,7 +29620,7 @@ var StaticSymbolResolver = /** @class */ (function () {
                         }
                     }
                 }
-                else if (symbolic === 'error') {
+                else if (symbolic === 'error.jsp') {
                     return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, map, { fileName: getOriginalName() });
                 }
                 else {
@@ -29814,7 +29814,7 @@ var ToJsonSerializer = /** @class */ (function (_super) {
                 if (!isFunctionCall(metadata_1) && !isMethodCallOnVariable(metadata_1)) {
                     // Don't store complex calls as we won't be able to simplify them anyways later on.
                     metadata_1 = {
-                        __symbolic: 'error',
+                        __symbolic: 'error.jsp',
                         message: 'Complex function calls are not supported.',
                     };
                 }
@@ -29929,7 +29929,7 @@ var ToJsonSerializer = /** @class */ (function (_super) {
         if (map['__symbolic'] === 'resolved') {
             return visitValue(map['symbol'], this, context);
         }
-        if (map['__symbolic'] === 'error') {
+        if (map['__symbolic'] === 'error.jsp') {
             delete map['line'];
             delete map['character'];
         }
@@ -30842,7 +30842,7 @@ function analyzeFile(host, staticSymbolResolver, metadataResolver, fileName) {
         staticSymbolResolver.getSymbolsOf(fileName).forEach(function (symbol) {
             var resolvedSymbol = staticSymbolResolver.resolveSymbol(symbol);
             var symbolMeta = resolvedSymbol.metadata;
-            if (!symbolMeta || symbolMeta.__symbolic === 'error') {
+            if (!symbolMeta || symbolMeta.__symbolic === 'error.jsp') {
                 return;
             }
             var isNgSymbol = false;
@@ -30887,7 +30887,7 @@ function analyzeFileForInjectables(host, staticSymbolResolver, metadataResolver,
         staticSymbolResolver.getSymbolsOf(fileName).forEach(function (symbol) {
             var resolvedSymbol = staticSymbolResolver.resolveSymbol(symbol);
             var symbolMeta = resolvedSymbol.metadata;
-            if (!symbolMeta || symbolMeta.__symbolic === 'error') {
+            if (!symbolMeta || symbolMeta.__symbolic === 'error.jsp') {
                 return;
             }
             if (symbolMeta.__symbolic === 'class') {
@@ -31422,7 +31422,7 @@ var StaticReflector = /** @class */ (function () {
                     }
                     try {
                         var value_1 = targetFunction['value'];
-                        if (value_1 && (depth != 0 || value_1.__symbolic != 'error')) {
+                        if (value_1 && (depth != 0 || value_1.__symbolic != 'error.jsp')) {
                             var parameters = targetFunction['parameters'];
                             var defaults = targetFunction.defaults;
                             args = args.map(function (arg) { return simplifyNested(context, arg); })
@@ -31694,7 +31694,7 @@ var StaticReflector = /** @class */ (function () {
                                     }
                                 }
                                 return IGNORE;
-                            case 'error':
+                            case 'error.jsp':
                                 var message = expression.message;
                                 if (expression['line'] != null) {
                                     self.error({
@@ -32483,7 +32483,7 @@ function _declareFn(varNames, statements, ctx, visitor) {
         return _executeFunctionStatements(varNames, args, statements, ctx, visitor);
     };
 }
-var CATCH_ERROR_VAR$2 = 'error';
+var CATCH_ERROR_VAR$2 = 'error.jsp';
 var CATCH_STACK_VAR$2 = 'stack';
 
 /**
