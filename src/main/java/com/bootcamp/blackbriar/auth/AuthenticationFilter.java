@@ -1,14 +1,11 @@
 package com.bootcamp.blackbriar.auth;
 
+import com.bootcamp.blackbriar.SpringApplicationContext;
 import com.bootcamp.blackbriar.business.UserService;
-import com.bootcamp.blackbriar.business.UserServiceImpl;
-import com.bootcamp.blackbriar.model.UserEntity;
 import com.bootcamp.blackbriar.model.UserLoginRequestModel;
-import com.bootcamp.blackbriar.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,7 +29,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
   }
 
   @Override
-  public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
+  public Authentication attemptAuthentication(HttpServletRequest req,
+                                              HttpServletResponse res) throws AuthenticationException {
     try {
       UserLoginRequestModel credentials = new ObjectMapper()
         .readValue(req.getInputStream(), UserLoginRequestModel.class);
@@ -56,13 +54,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                        Authentication auth) throws IOException, ServletException {
     String username = ((User) auth.getPrincipal()).getUsername();
     Date tokenExpiration = new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME);
+    UserService userService = (UserService)SpringApplicationContext.getBean("userServiceImpl");
 
     String token = Jwts.builder()
-      .setSubject(username)
+      .setSubject(userService.getUser(username).getUserId())
       .setExpiration(tokenExpiration)
       .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
       .compact();
 
-    res.getWriter().write(SecurityConstants.TOKEN_PREFIX + token);
+    res.getWriter().write("{ \"token\": \"" + token + "\" }");
   }
 }
