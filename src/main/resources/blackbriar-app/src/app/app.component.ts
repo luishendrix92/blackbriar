@@ -5,6 +5,15 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'blackbriar-app';
+export class AppComponent 
+{
+  title = 'blackbriar';
+  
+  //This variable controls the no logged bar
+  loggedIn: boolean = false;
+
+  ngOnInit()
+  {
+    
+  }
 }

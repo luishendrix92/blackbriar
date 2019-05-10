@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "blackbriar-app": {
+    "blackbriar": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "../static",
+            "outputPath": "dist/blackbriar",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -23,9 +23,15 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/materialize-css/dist/css/materialize.css",
+              "node_modules/font-awesome/css/font-awesome.css"
             ],
-            "scripts": [],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/hammerjs/hammer.js",
+              "node_modules/materialize-css/dist/js/materialize.js"
+            ],
             "es5BrowserSupport": true
           },
           "configurations": {
@@ -58,18 +64,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "blackbriar-app:build"
+            "browserTarget": "blackbriar:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "blackbriar-app:build:production"
+              "browserTarget": "blackbriar:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "blackbriar-app:build"
+            "browserTarget": "blackbriar:build"
           }
         },
         "test": {
@@ -82,7 +88,11 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": [],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/hammerjs/hammer.js",
+              "node_modules/materialize-css/dist/js/materialize.js"
+            ],
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -103,7 +113,7 @@
         }
       }
     },
-    "blackbriar-app-e2e": {
+    "blackbriar-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -112,11 +122,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "blackbriar-app:serve"
+            "devServerTarget": "blackbriar:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "blackbriar-app:serve:production"
+              "devServerTarget": "blackbriar:serve:production"
             }
           }
         },
@@ -132,5 +142,5 @@
       }
     }
   },
-  "defaultProject": "blackbriar-app"
+  "defaultProject": "blackbriar"
 }
