@@ -1,0 +1,20 @@
+.containerBackground
+{
+    background: #f4f4f4;
+    height: 100%;
+}
+
+.cardOwn
+{
+    -webkit-box-shadow: 5px 9px 5px 0px rgba(125,125,125,0.77);
+    -moz-box-shadow: 5px 9px 5px 0px rgba(125,125,125,0.77);
+    box-shadow: 5px 9px 5px 0px rgba(125,125,125,0.77);
+}
+
+.background8BitImage
+{
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    
+}

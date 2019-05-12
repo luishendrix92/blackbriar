@@ -62,6 +62,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
       .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
       .compact();
 
-    res.getWriter().write(token);
+    res.getWriter().write("{ \"token\": \"" + token + "\" }");
   }
 }
