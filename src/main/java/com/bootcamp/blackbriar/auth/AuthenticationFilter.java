@@ -1,8 +1,8 @@
 package com.bootcamp.blackbriar.auth;
 
 import com.bootcamp.blackbriar.SpringApplicationContext;
-import com.bootcamp.blackbriar.business.UserService;
-import com.bootcamp.blackbriar.model.UserLoginRequestModel;
+import com.bootcamp.blackbriar.business.user.UserService;
+import com.bootcamp.blackbriar.model.user.UserLoginRequestModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

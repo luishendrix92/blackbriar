@@ -1,44 +1,48 @@
 package com.bootcamp.blackbriar.api;
 
-import com.bootcamp.blackbriar.business.GroupService;
-import com.bootcamp.blackbriar.model.Group.GroupEntity;
-import com.bootcamp.blackbriar.model.Group.GroupRest;
-import org.springframework.beans.BeanUtils;
+import com.bootcamp.blackbriar.business.group.GroupService;
+import com.bootcamp.blackbriar.model.group.GroupEntity;
+import com.bootcamp.blackbriar.model.group.GroupResponse;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Type;
+import java.util.List;
+
 @RestController
-@RequestMapping("groups") //http://localhost:8080/Groups
+@RequestMapping(value = "/api/groups")
 public class GroupController {
-    @Autowired
-    GroupService groupService;
+  @Autowired
+  GroupService groupService;
 
-    @GetMapping
-    public String getGroup(){
-        return "get groups was called";
-    }
+  @Autowired
+  ModelMapper modelMapper;
 
-    @PostMapping
-    public GroupEntity createGroup(@RequestBody GroupEntity groupData){
-        //GroupRest returnValue = new GroupRest();
-        GroupEntity createdGroup  = groupService.createGroup(groupData);
+  @GetMapping
+  public List<GroupResponse> allGroups() {
+    List<GroupEntity> groups = groupService.getAllGroups();
+    Type withOwnerData = new TypeToken<List<GroupResponse>>(){}.getType();
+    List<GroupResponse> serializedGroupList = modelMapper.map(groups, withOwnerData);
 
-        //BeanUtils.copyProperties(createdGroup, returnValue);
+    return serializedGroupList;
+  }
 
-        return createdGroup;
-    }
+  @PostMapping
+  public GroupEntity createGroup(@RequestBody GroupEntity groupData) {
+    GroupEntity createdGroup  = groupService.createGroup(groupData);
 
-    @PutMapping
-    public String updateGroup(){
-        return "update group was called";
-    }
+    return createdGroup;
+  }
 
-    @DeleteMapping
-    public String deleteGroup(){
-        return "delete group was called";
-    }
+  @PutMapping
+  public String updateGroup(){
+    return "update group was called";
+  }
 
-
-
-
+  @DeleteMapping
+  public String deleteGroup(){
+    return "delete group was called";
+  }
 }

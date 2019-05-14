@@ -1,6 +1,6 @@
 package com.bootcamp.blackbriar.repository;
 
-import com.bootcamp.blackbriar.model.UserEntity;
+import com.bootcamp.blackbriar.model.user.UserEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
