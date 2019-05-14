@@ -1,7 +1,6 @@
 package com.bootcamp.blackbriar.auth;
 
-import com.bootcamp.blackbriar.business.UserService;
-import com.mysql.cj.Session;
+import com.bootcamp.blackbriar.business.user.UserService;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,7 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
 @EnableWebSecurity
@@ -29,9 +27,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     authenticationFilter.setFilterProcessesUrl(SecurityConstants.SIGN_IN_URL);
 
     http
-            .cors()
-            .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
-            .and()
+      .cors()
+        .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
+      .and()
       .csrf()
         .disable()
       .authorizeRequests()
@@ -42,7 +40,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
       )
         .permitAll()
       .antMatchers("/api/**")
-        .permitAll()
+        .authenticated()
       .anyRequest()
         .permitAll()
       .and()
