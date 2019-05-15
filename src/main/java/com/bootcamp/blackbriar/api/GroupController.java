@@ -29,11 +29,11 @@ public class GroupController {
     return serializedGroupList;
   }
 
-  @PostMapping
-  public GroupEntity createGroup(@RequestBody GroupEntity groupData) {
-    GroupEntity createdGroup  = groupService.createGroup(groupData);
+  @GetMapping(value = "/{groupId}")
+  public GroupResponse singleGroup(@PathVariable long groupId) {
+    GroupEntity group = groupService.getGroup(groupId);
 
-    return createdGroup;
+    return modelMapper.map(group, GroupResponse.class);
   }
 
   @PutMapping

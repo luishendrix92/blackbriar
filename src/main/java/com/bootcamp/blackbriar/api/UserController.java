@@ -6,6 +6,7 @@ import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.group.InstructorGroupResponse;
 import com.bootcamp.blackbriar.model.user.UserDetailsRequestModel;
 import com.bootcamp.blackbriar.model.user.UserDto;
+import com.bootcamp.blackbriar.model.user.UserEntity;
 import com.bootcamp.blackbriar.model.user.UserRest;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -28,9 +29,11 @@ public class UserController {
   @Autowired
   ModelMapper modelMapper;
 
-  @GetMapping
-  public String getUser() {
-    return "GET request for a collection of users.";
+  @GetMapping(value = "/{userId}")
+  public UserRest getUser(@PathVariable String userId) {
+    UserEntity user = userService.getUserByPublicId(userId);
+
+    return modelMapper.map(user, UserRest.class);
   }
 
   @GetMapping(value = "/{instructorUserId}/groups/owned")
@@ -40,6 +43,15 @@ public class UserController {
     List<InstructorGroupResponse> serializedGroupList = modelMapper.map(groups, withNoOwnerData);
 
     return serializedGroupList;
+  }
+
+  @PostMapping(value = "/{instructorUserId}/groups/owned")
+  public InstructorGroupResponse createGroup(
+    @PathVariable String instructorUserId,
+    @RequestBody GroupEntity groupData) {
+    GroupEntity createdGroup = groupService.createGroup(instructorUserId, groupData);
+
+    return modelMapper.map(createdGroup, InstructorGroupResponse.class);
   }
 
   @PostMapping
