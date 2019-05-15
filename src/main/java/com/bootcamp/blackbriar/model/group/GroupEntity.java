@@ -27,6 +27,8 @@ public class GroupEntity implements Serializable {
   @Column(length = 100, nullable = false)
   private String image = "blank.jpg";
 
+  private boolean publicGroup = true;
+
   public long getId() {
     return id;
   }
@@ -65,5 +67,13 @@ public class GroupEntity implements Serializable {
 
   public void setImage(String image) {
     this.image = image;
+  }
+
+  public boolean isPublicGroup() {
+    return publicGroup;
+  }
+
+  public void setPublicGroup(boolean publicGroup) {
+    this.publicGroup = publicGroup;
   }
 }

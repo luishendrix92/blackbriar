@@ -6,8 +6,10 @@ import com.bootcamp.blackbriar.model.user.UserEntity;
 import com.bootcamp.blackbriar.repository.GroupRepository;
 import com.bootcamp.blackbriar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -19,8 +21,12 @@ public class GroupServiceImpl implements GroupService {
   UserRepository userRepository;
 
   @Override
-  public GroupEntity createGroup(GroupEntity group) {
-    UserEntity groupOwner = userRepository.findById(1L).get();
+  public GroupEntity createGroup(String instructorUserId, GroupEntity group)  {
+    UserEntity groupOwner = userRepository.findByUserId(instructorUserId);
+
+    if (groupOwner == null) {
+      throw new EntityNotFoundException("The user who wishes to create the group does not exist.");
+    }
 
     group.setOwner(groupOwner);
 
@@ -41,6 +47,14 @@ public class GroupServiceImpl implements GroupService {
     List<GroupEntity> groups = groupRepository.findByOwnerUserId(instructorUserId);
 
     return groups;
+  }
+
+  @Override
+  public GroupEntity getGroup(long groupId) {
+    GroupEntity group = groupRepository.findById(groupId)
+      .orElseThrow(() -> new EntityNotFoundException("This group was removed or doesn't exist."));
+
+    return group;
   }
 
 }

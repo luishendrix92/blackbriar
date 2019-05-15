@@ -8,6 +8,7 @@ public class GroupResponse {
   private String description;
   private String image = "blank.jpg";
   private UserRest owner;
+  private boolean publicGroup = true;
 
   public long getId() {
     return id;
@@ -47,5 +48,13 @@ public class GroupResponse {
 
   public void setOwner(UserRest owner) {
     this.owner = owner;
+  }
+
+  public boolean isPublicGroup() {
+    return publicGroup;
+  }
+
+  public void setPublicGroup(boolean publicGroup) {
+    this.publicGroup = publicGroup;
   }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 
 @Service
@@ -62,6 +63,17 @@ public class UserServiceImpl implements UserService {
     BeanUtils.copyProperties(userEntity, returnValue);
 
     return returnValue;
+  }
+
+  @Override
+  public UserEntity getUserByPublicId(String userId) {
+    UserEntity user = userRepository.findByUserId(userId);
+
+    if (user == null) {
+      throw new EntityNotFoundException("Could not find a user with the provided userId.");
+    }
+
+    return user;
   }
 
   /*
