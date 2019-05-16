@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "user")
+@Table(name = "usr")
 public class UserEntity implements Serializable {
   private static final long serialVersionUID = -8011797215999645996L;
 
