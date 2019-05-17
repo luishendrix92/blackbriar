@@ -1,12 +1,12 @@
-package com.bootcamp.blackbriar.business.group;
+package com.bootcamp.blackbriar.service.group;
 
-import com.bootcamp.blackbriar.business.group.GroupService;
+import com.bootcamp.blackbriar.service.group.GroupService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
+import com.bootcamp.blackbriar.model.group.StudentGroupResponse;
 import com.bootcamp.blackbriar.model.user.UserEntity;
 import com.bootcamp.blackbriar.repository.GroupRepository;
 import com.bootcamp.blackbriar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -50,11 +50,17 @@ public class GroupServiceImpl implements GroupService {
   }
 
   @Override
+  public List<StudentGroupResponse> getStudentGroups(String studentUserId) {
+    List<StudentGroupResponse> groups = groupRepository.findByStudentUserId(studentUserId);
+
+    return groups;
+  }
+
+  @Override
   public GroupEntity getGroup(long groupId) {
     GroupEntity group = groupRepository.findById(groupId)
       .orElseThrow(() -> new EntityNotFoundException("This group was removed or doesn't exist."));
 
     return group;
   }
-
 }

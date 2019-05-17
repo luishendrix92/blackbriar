@@ -1,4 +1,4 @@
-package com.bootcamp.blackbriar.business;
+package com.bootcamp.blackbriar.service;
 
 import org.springframework.stereotype.Component;
 

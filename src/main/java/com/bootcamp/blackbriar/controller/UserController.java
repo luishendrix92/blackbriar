@@ -1,9 +1,10 @@
-package com.bootcamp.blackbriar.api;
+package com.bootcamp.blackbriar.controller;
 
-import com.bootcamp.blackbriar.business.group.GroupService;
-import com.bootcamp.blackbriar.business.user.UserService;
+import com.bootcamp.blackbriar.service.group.GroupService;
+import com.bootcamp.blackbriar.service.user.UserService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.group.InstructorGroupResponse;
+import com.bootcamp.blackbriar.model.group.StudentGroupResponse;
 import com.bootcamp.blackbriar.model.user.UserDetailsRequestModel;
 import com.bootcamp.blackbriar.model.user.UserDto;
 import com.bootcamp.blackbriar.model.user.UserEntity;
@@ -43,6 +44,13 @@ public class UserController {
     List<InstructorGroupResponse> serializedGroupList = modelMapper.map(groups, withNoOwnerData);
 
     return serializedGroupList;
+  }
+
+  @GetMapping(value = "/{studentUserId}/groups/subscribed")
+  public List<StudentGroupResponse> studentGroups(@PathVariable String studentUserId) {
+    List<StudentGroupResponse> groups = groupService.getStudentGroups(studentUserId);
+
+    return groups;
   }
 
   @PostMapping(value = "/{instructorUserId}/groups/owned")

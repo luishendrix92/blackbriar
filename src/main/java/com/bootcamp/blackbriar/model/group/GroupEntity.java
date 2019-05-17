@@ -1,9 +1,12 @@
 package com.bootcamp.blackbriar.model.group;
 
+import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.model.user.UserEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity(name="Group")
@@ -18,6 +21,9 @@ public class GroupEntity implements Serializable {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_user")
   private UserEntity owner;
+
+  @OneToMany(mappedBy = "group")
+  private List<MembershipEntity> members = new ArrayList<MembershipEntity>();
 
   @Column(length = 100, nullable = false)
   private String title;
@@ -75,5 +81,13 @@ public class GroupEntity implements Serializable {
 
   public void setPublicGroup(boolean publicGroup) {
     this.publicGroup = publicGroup;
+  }
+
+  public List<MembershipEntity> getMembers() {
+    return members;
+  }
+
+  public void setMembers(List<MembershipEntity> members) {
+    this.members = members;
   }
 }
