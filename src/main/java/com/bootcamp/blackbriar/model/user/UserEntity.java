@@ -1,6 +1,7 @@
 package com.bootcamp.blackbriar.model.user;
 
 import com.bootcamp.blackbriar.model.group.GroupEntity;
+import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,6 +18,9 @@ public class UserEntity implements Serializable {
 
   @OneToMany(mappedBy = "owner")
   private List<GroupEntity> ownedGroups = new ArrayList<GroupEntity>();
+
+  @OneToMany(mappedBy = "student")
+  private List<MembershipEntity> studyGroups = new ArrayList<MembershipEntity>();
 
   @Column(nullable = false)
   private String userId;
@@ -119,5 +123,13 @@ public class UserEntity implements Serializable {
 
   public void setEmailVerificationStatus(boolean emailVerificationStatus) {
     this.emailVerificationStatus = emailVerificationStatus;
+  }
+
+  public List<MembershipEntity> getStudyGroups() {
+    return studyGroups;
+  }
+
+  public void setStudyGroups(List<MembershipEntity> studyGroups) {
+    this.studyGroups = studyGroups;
   }
 }
