@@ -1,6 +1,7 @@
 package com.bootcamp.blackbriar.service.user;
 
 import com.bootcamp.blackbriar.service.Utils;
+import com.bootcamp.blackbriar.model.user.GroupMemberResponse;
 import com.bootcamp.blackbriar.model.user.UserDto;
 import com.bootcamp.blackbriar.model.user.UserEntity;
 import com.bootcamp.blackbriar.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -77,9 +79,9 @@ public class UserServiceImpl implements UserService {
   }
 
   /*
-   * This method will help Spring Security find a user by username (email)
-   * and make authentication claims with the provided encrypted password which
-   * will be compared to an encoded password provided by the login request model.
+   * This method will help Spring Security find a user by username (email) and
+   * make authentication claims with the provided encrypted password which will be
+   * compared to an encoded password provided by the login request model.
    */
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -90,5 +92,12 @@ public class UserServiceImpl implements UserService {
     }
 
     return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
+  }
+
+  @Override
+  public List<GroupMemberResponse> getGroupMembers(long groupId) {
+    List<GroupMemberResponse> members = userRepository.findByGroupId(groupId);
+
+    return members;
   }
 }

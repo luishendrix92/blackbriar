@@ -1,8 +1,11 @@
 package com.bootcamp.blackbriar.controller;
 
 import com.bootcamp.blackbriar.service.group.GroupService;
+import com.bootcamp.blackbriar.service.user.UserService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.group.GroupResponse;
+import com.bootcamp.blackbriar.model.user.GroupMemberResponse;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,9 @@ public class GroupController {
   GroupService groupService;
 
   @Autowired
+  UserService userService;
+
+  @Autowired
   ModelMapper modelMapper;
 
   @GetMapping
@@ -27,6 +33,11 @@ public class GroupController {
     List<GroupResponse> serializedGroupList = modelMapper.map(groups, withOwnerData);
 
     return serializedGroupList;
+  }
+
+  @GetMapping(value = "/{groupId}/students")
+  public List<GroupMemberResponse> groupMembers(@PathVariable long groupId) {
+    return userService.getGroupMembers(groupId);
   }
 
   @GetMapping(value = "/{groupId}")
