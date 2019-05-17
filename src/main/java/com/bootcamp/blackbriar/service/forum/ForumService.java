@@ -1,15 +1,9 @@
-/**
- * User: Alexis M. Gutierrez Kinto
- * Date: 13/05/19
- */
-
-package com.bootcamp.blackbriar.business.forum;
+package com.bootcamp.blackbriar.service.forum;
 
 import com.bootcamp.blackbriar.converter.Converter;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumModel;
-import com.bootcamp.blackbriar.repository.forum.ForumRepository;
-import net.bytebuddy.dynamic.scaffold.FieldLocator;
+import com.bootcamp.blackbriar.repository.ForumRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,9 +71,5 @@ public class ForumService {
     public List<ForumModel> get(){
         return converter.convertList(repository.findAll());
     }
-
-//    public List<ForumModel> getFromTitle(String title){
-//        return converter.convertList(repository.findByTitle(title));
-//    }
 }
 

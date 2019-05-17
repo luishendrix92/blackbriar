@@ -1,12 +1,11 @@
-package com.bootcamp.blackbriar.business.group;
+package com.bootcamp.blackbriar.service.group;
 
-import com.bootcamp.blackbriar.business.group.GroupService;
+import com.bootcamp.blackbriar.service.group.GroupService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.user.UserEntity;
 import com.bootcamp.blackbriar.repository.GroupRepository;
 import com.bootcamp.blackbriar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;

@@ -1,6 +1,6 @@
-package com.bootcamp.blackbriar.business.user;
+package com.bootcamp.blackbriar.service.user;
 
-import com.bootcamp.blackbriar.business.Utils;
+import com.bootcamp.blackbriar.service.Utils;
 import com.bootcamp.blackbriar.model.user.UserDto;
 import com.bootcamp.blackbriar.model.user.UserEntity;
 import com.bootcamp.blackbriar.repository.UserRepository;
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
   }
 
   /*
-   * Luis: This method will help Spring Security find a user by username (email)
+   * This method will help Spring Security find a user by username (email)
    * and make authentication claims with the provided encrypted password which
    * will be compared to an encoded password provided by the login request model.
    */

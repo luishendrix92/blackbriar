@@ -1,18 +1,11 @@
-/**
- * User: Alexis M. Gutierrez Kinto
- * Date: 13/05/19
- */
-
-package com.bootcamp.blackbriar.repository.forum;
+package com.bootcamp.blackbriar.repository;
 
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
-import java.util.List;
 
-// Repository - se encarga de hacer peticiones a la base de datos
 @Repository("repository")
 public interface ForumRepository extends JpaRepository<ForumEntity, Serializable>{
 

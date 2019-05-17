@@ -1,8 +1,3 @@
-/**
- * User: Alexis M. Gutierrez Kinto
- * Date: 10/05/19
- */
-
 package com.bootcamp.blackbriar.model.forum;
 
 
@@ -16,8 +11,9 @@ import java.io.Serializable;
 @Table(name = "forum")
 @Entity
 public class ForumEntity implements Serializable {
+    private static final long serialVersionUID = -2984991408087361106L;
 
-    public ForumEntity(){
+    public ForumEntity() {
 
     }
 

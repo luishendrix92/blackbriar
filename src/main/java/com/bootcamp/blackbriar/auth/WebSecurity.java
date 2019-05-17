@@ -1,6 +1,6 @@
 package com.bootcamp.blackbriar.auth;
 
-import com.bootcamp.blackbriar.business.user.UserService;
+import com.bootcamp.blackbriar.service.user.UserService;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,7 +40,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
       )
         .permitAll()
       .antMatchers("/api/**")
-        .authenticated()
+        .permitAll()
       .anyRequest()
         .permitAll()
       .and()

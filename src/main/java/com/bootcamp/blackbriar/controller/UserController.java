@@ -1,7 +1,7 @@
-package com.bootcamp.blackbriar.api;
+package com.bootcamp.blackbriar.controller;
 
-import com.bootcamp.blackbriar.business.group.GroupService;
-import com.bootcamp.blackbriar.business.user.UserService;
+import com.bootcamp.blackbriar.service.group.GroupService;
+import com.bootcamp.blackbriar.service.user.UserService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.group.InstructorGroupResponse;
 import com.bootcamp.blackbriar.model.user.UserDetailsRequestModel;

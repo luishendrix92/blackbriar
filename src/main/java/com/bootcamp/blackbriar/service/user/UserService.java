@@ -1,4 +1,4 @@
-package com.bootcamp.blackbriar.business.user;
+package com.bootcamp.blackbriar.service.user;
 
 import com.bootcamp.blackbriar.model.user.UserDto;
 import com.bootcamp.blackbriar.model.user.UserEntity;

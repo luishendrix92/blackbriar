@@ -1,4 +1,4 @@
-package com.bootcamp.blackbriar.business.group;
+package com.bootcamp.blackbriar.service.group;
 
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 

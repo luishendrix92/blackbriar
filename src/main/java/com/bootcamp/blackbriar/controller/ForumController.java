@@ -1,11 +1,6 @@
-/**
- * User: Alexis M. Gutierrez Kinto
- * Date: 13/05/19
- */
+package com.bootcamp.blackbriar.controller;
 
-package com.bootcamp.blackbriar.api.forum;
-
-import com.bootcamp.blackbriar.business.forum.ForumService;
+import com.bootcamp.blackbriar.service.forum.ForumService;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumModel;
 import org.springframework.beans.factory.annotation.Autowired;
