@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
   @Autowired
   Utils utils;
 
+  // TODO: Clean this mess of property copying
   @Override
   public UserDto createUser(UserDto user) {
     if (userRepository.findByEmail(user.getEmail()) != null) {

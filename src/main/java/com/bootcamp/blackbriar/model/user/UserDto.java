@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class UserDto implements Serializable {
   private static final long serialVersionUID = -6546925859137218064L;
+
   private long id;
   private String userId;
   private String encryptedPassword;
@@ -13,6 +14,8 @@ public class UserDto implements Serializable {
   private String password;
   private String firstName;
   private String lastName;
+  private boolean isStudent = true;
+
   private String photo = "anon.jpg";
 
   public long getId() {
@@ -93,5 +96,13 @@ public class UserDto implements Serializable {
 
   public void setPhoto(String photo) {
     this.photo = photo;
+  }
+
+  public boolean isStudent() {
+    return isStudent;
+  }
+
+  public void setStudent(boolean isStudent) {
+    this.isStudent = isStudent;
   }
 }

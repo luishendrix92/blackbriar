@@ -1,5 +1,6 @@
 package com.bootcamp.blackbriar.model.user;
 
+// TODO: Remove this class; it's not being used...
 public class UserLoginRest {
   private String userId;
   private String firstName;
