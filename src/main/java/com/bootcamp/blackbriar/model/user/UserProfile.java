@@ -1,19 +1,19 @@
 package com.bootcamp.blackbriar.model.user;
 
-public class UserDetailsRequestModel {
-  private String password;
+public class UserProfile {
+  private String userId;
   private String firstName;
   private String lastName;
   private String email;
-  private String photo = "anon.jpg";
+  private String photo;
   private boolean isStudent = true;
 
-  public String getPassword() {
-    return password;
+  public String getUserId() {
+    return userId;
   }
 
-  public void setPassword(String password) {
-    this.password = password;
+  public void setUserId(String userId) {
+    this.userId = userId;
   }
 
   public String getFirstName() {

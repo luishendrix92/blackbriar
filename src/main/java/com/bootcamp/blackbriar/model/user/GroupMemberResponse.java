@@ -5,9 +5,6 @@ import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 
 import org.springframework.beans.BeanUtils;
 
-/**
- * GroupMemberResponse
- */
 public class GroupMemberResponse {
   private String firstName;
   private String lastName;

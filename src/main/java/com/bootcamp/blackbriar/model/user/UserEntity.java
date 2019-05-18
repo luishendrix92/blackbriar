@@ -38,6 +38,9 @@ public class UserEntity implements Serializable {
   private String photo = "anon.jpg";
 
   @Column(nullable = false)
+  private boolean isStudent = true;
+
+  @Column(nullable = false)
   private String encryptedPassword;
 
   private String emailVerificationToken;
@@ -131,5 +134,13 @@ public class UserEntity implements Serializable {
 
   public void setStudyGroups(List<MembershipEntity> studyGroups) {
     this.studyGroups = studyGroups;
+  }
+
+  public boolean isStudent() {
+    return isStudent;
+  }
+
+  public void setStudent(boolean isStudent) {
+    this.isStudent = isStudent;
   }
 }

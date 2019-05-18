@@ -5,10 +5,7 @@ import com.bootcamp.blackbriar.service.user.UserService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.group.InstructorGroupResponse;
 import com.bootcamp.blackbriar.model.group.StudentGroupResponse;
-import com.bootcamp.blackbriar.model.user.UserDetailsRequestModel;
-import com.bootcamp.blackbriar.model.user.UserDto;
-import com.bootcamp.blackbriar.model.user.UserEntity;
-import com.bootcamp.blackbriar.model.user.UserRest;
+import com.bootcamp.blackbriar.model.user.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
@@ -31,10 +28,10 @@ public class UserController {
   ModelMapper modelMapper;
 
   @GetMapping(value = "/{userId}")
-  public UserRest getUser(@PathVariable String userId) {
+  public UserProfile getUser(@PathVariable String userId) {
     UserEntity user = userService.getUserByPublicId(userId);
 
-    return modelMapper.map(user, UserRest.class);
+    return modelMapper.map(user, UserProfile.class);
   }
 
   @GetMapping(value = "/{instructorUserId}/groups/owned")
@@ -63,8 +60,8 @@ public class UserController {
   }
 
   @PostMapping
-  public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
-    UserRest returnValue = new UserRest();
+  public UserProfile createUser(@RequestBody UserDetailsRequestModel userDetails) {
+    UserProfile returnValue = new UserProfile();
     UserDto userDto = new UserDto();
 
     BeanUtils.copyProperties(userDetails, userDto);
