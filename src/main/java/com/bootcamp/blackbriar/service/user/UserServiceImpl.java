@@ -1,5 +1,8 @@
 package com.bootcamp.blackbriar.service.user;
 
+import com.bootcamp.blackbriar.model.membership.MembershipDetails;
+import com.bootcamp.blackbriar.model.membership.MembershipEntity;
+import com.bootcamp.blackbriar.repository.MembershipRepository;
 import com.bootcamp.blackbriar.service.Utils;
 import com.bootcamp.blackbriar.model.user.GroupMemberResponse;
 import com.bootcamp.blackbriar.model.user.UserDto;
@@ -24,6 +27,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   BCryptPasswordEncoder bCryptPasswordEncoder;
+
+  @Autowired
+  MembershipRepository membershipRepository;
 
   @Autowired
   Utils utils;
@@ -91,7 +97,7 @@ public class UserServiceImpl implements UserService {
       throw new UsernameNotFoundException(email);
     }
 
-    return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
+    return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>()); 
   }
 
   @Override
@@ -99,5 +105,16 @@ public class UserServiceImpl implements UserService {
     List<GroupMemberResponse> members = userRepository.findByGroupId(groupId);
 
     return members;
+  }
+
+  @Override
+  public MembershipDetails createSubscription(long studentId, long groupId){
+    if(membershipRepository.insertMemberships(studentId, groupId, true) == false){
+      throw new EntityNotFoundException("ERROR");
+    }
+    MembershipDetails newMember = new MembershipDetails();
+    newMember.setActive(true);
+
+    return newMember;
   }
 }

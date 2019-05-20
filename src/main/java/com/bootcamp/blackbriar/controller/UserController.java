@@ -1,5 +1,7 @@
 package com.bootcamp.blackbriar.controller;
 
+import com.bootcamp.blackbriar.model.membership.MembershipDetails;
+import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.service.group.GroupService;
 import com.bootcamp.blackbriar.service.user.UserService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
@@ -51,6 +53,15 @@ public class UserController {
     List<StudentGroupResponse> groups = groupService.getStudentGroups(studentUserId);
 
     return groups;
+  }
+
+  @PostMapping(value = "/{studentUserId}/{groupId}/groups/subscribed")
+  public MembershipDetails createSubscription(
+          @PathVariable long studentUserId,
+          @PathVariable long groupId){
+     MembershipDetails createdSubscription= userService.createSubscription(studentUserId, groupId);
+
+    return createdSubscription;
   }
 
   @PostMapping(value = "/{instructorUserId}/groups/owned")
