@@ -6,6 +6,7 @@ import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.group.InstructorGroupResponse;
 import com.bootcamp.blackbriar.model.group.StudentGroupResponse;
 import com.bootcamp.blackbriar.model.user.*;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Type;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -32,6 +34,11 @@ public class UserController {
     UserEntity user = userService.getUserByPublicId(userId);
 
     return modelMapper.map(user, UserProfile.class);
+  }
+
+  @GetMapping(value = "/me")
+  public String whoAmI(Principal auth) {
+    return auth.getName();
   }
 
   @GetMapping(value = "/{instructorUserId}/groups/owned")

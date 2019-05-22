@@ -15,7 +15,7 @@ public class GroupEntity implements Serializable {
   private static final long serialVersionUID = -7975243537766512485L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
