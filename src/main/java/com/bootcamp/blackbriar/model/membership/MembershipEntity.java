@@ -24,6 +24,7 @@ public class MembershipEntity implements Serializable {
   private long id;
 
   private boolean active = true;
+  private boolean invitation = false;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_user")
@@ -63,5 +64,13 @@ public class MembershipEntity implements Serializable {
 
   public void setGroup(GroupEntity group) {
     this.group = group;
+  }
+
+  public boolean isInvitation() {
+    return invitation;
+  }
+
+  public void setInvitation(boolean invitation) {
+    this.invitation = invitation;
   }
 }

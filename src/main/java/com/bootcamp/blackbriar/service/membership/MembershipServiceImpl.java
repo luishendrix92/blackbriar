@@ -29,24 +29,47 @@ public class MembershipServiceImpl implements MembershipService {
   @Override
   public MembershipResponse joinGroup(UserEntity student, GroupEntity group) {
     MembershipEntity existingMembership = membershipRepository.getByCompositeKey(student.getUserId(), group.getId());
-    MembershipResponse newMembership = new MembershipResponse();
-    MembershipEntity membership = new MembershipEntity();
+    MembershipResponse response = new MembershipResponse();
+    MembershipEntity newMembership;
 
     if (group.getOwner().getUserId().equals(student.getUserId())) {
       throw new RuntimeException("Instructors can't join their own grups as students.");
     } else if (existingMembership != null && existingMembership.isActive()) {
       throw new RuntimeException("You are already a member of this group.");
+    } else if (
+      existingMembership != null &&
+      !existingMembership.isActive() &&
+      !existingMembership.isInvitation()
+    ) {
+      throw new RuntimeException("Your membership request is pending approval.");
+    } else if (
+      existingMembership != null &&
+      existingMembership.isInvitation() &&
+      !existingMembership.isActive()
+    ) {
+      newMembership = existingMembership;
+
+      newMembership.setActive(true);
+
+      newMembership = membershipRepository.save(newMembership);
+    } else {
+      newMembership = new MembershipEntity();
+
+      newMembership.setActive(group.isPublicGroup());
+      newMembership.setGroup(group);
+      newMembership.setStudent(student);
+
+      newMembership = membershipRepository.save(newMembership);
     }
 
-    membership.setActive(true);
-    membership.setGroup(group);
-    membership.setStudent(student);
+    response = modelMapper.map(newMembership, MembershipResponse.class);
 
-    membership = membershipRepository.save(membership);
+    if (!group.isPublicGroup()) {
+      response.setStatusMessage("Your membership request has been sent to " + group.getOwner().getFirstName() + " " + group.getOwner().getLastName() + ".");
+    } else {
+      response.setStatusMessage("You have successfully joined " + group.getTitle() + " group.");
+    }
 
-    newMembership = modelMapper.map(membership, MembershipResponse.class);
-    newMembership.setStatusMessage("You have successfully joined.");
-
-    return newMembership;
+    return response;
   }
 }
