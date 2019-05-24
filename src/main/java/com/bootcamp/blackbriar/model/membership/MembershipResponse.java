@@ -8,6 +8,7 @@ public class MembershipResponse {
   private UserRest student;
   private GroupResponse group;
   private boolean active = true;
+  private boolean invitation = false;
   private String statusMessage = "No message assigned...";
 
   public long getId() {
@@ -48,5 +49,13 @@ public class MembershipResponse {
 
   public void setStatusMessage(String statusMessage) {
     this.statusMessage = statusMessage;
+  }
+
+  public boolean isInvitation() {
+    return invitation;
+  }
+
+  public void setInvitation(boolean invitation) {
+    this.invitation = invitation;
   }
 }
