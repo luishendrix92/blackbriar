@@ -15,4 +15,6 @@ public interface GroupService {
   GroupEntity getGroup(long groupId);
 
   List<StudentGroupResponse> getStudentGroups(String studentUserId);
+
+  List<StudentGroupResponse> exploreGroups(String userId);
 }

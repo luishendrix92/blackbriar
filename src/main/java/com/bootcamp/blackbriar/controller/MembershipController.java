@@ -5,6 +5,7 @@ import java.security.Principal;
 import javax.persistence.EntityNotFoundException;
 
 import com.bootcamp.blackbriar.model.group.GroupEntity;
+import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.model.membership.MembershipRequest;
 import com.bootcamp.blackbriar.model.membership.MembershipResponse;
 import com.bootcamp.blackbriar.model.user.UserEntity;
@@ -14,10 +15,7 @@ import com.bootcamp.blackbriar.service.membership.MembershipService;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/memberships")
@@ -33,6 +31,21 @@ public class MembershipController {
 
   @Autowired
   UserRepository userRepository;
+
+  @PutMapping(value = "/{membershipId}/approve")
+  public MembershipResponse approveRequest(@PathVariable long membershipId, Principal auth) {
+    MembershipEntity approved = membershipService.approveMembershipRequest(membershipId, auth.getName());
+    MembershipResponse response = modelMapper.map(approved, MembershipResponse.class);
+
+    response.setStatusMessage("You have successfully approved the request.");
+
+    return response;
+  }
+
+  @DeleteMapping(value = "/{membershipId}/deny")
+  public void denyRequest(@PathVariable long membershipId, Principal auth) {
+    membershipService.rejectMembershipRequest(membershipId, auth.getName());
+  }
 
   @PostMapping
   public MembershipResponse subscribe(

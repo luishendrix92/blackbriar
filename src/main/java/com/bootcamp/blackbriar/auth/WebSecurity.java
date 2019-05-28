@@ -1,5 +1,7 @@
 package com.bootcamp.blackbriar.auth;
 
+import java.util.Arrays;
+
 import com.bootcamp.blackbriar.service.user.UserService;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -28,7 +30,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
     http
       .cors()
-        .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
+        .configurationSource(request -> {
+          CorsConfiguration config = new CorsConfiguration()
+            .applyPermitDefaultValues();
+
+          config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+          
+          return config;
+        })
       .and()
       .csrf()
         .disable()

@@ -63,4 +63,11 @@ public class GroupServiceImpl implements GroupService {
 
     return group;
   }
+
+  @Override
+  public List<StudentGroupResponse> exploreGroups(String userId) {
+    List<StudentGroupResponse> groups = groupRepository.getGroupsWithMembershipDetails(userId);
+
+    return groups;
+  }
 }

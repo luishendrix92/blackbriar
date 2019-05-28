@@ -4,6 +4,7 @@ import com.bootcamp.blackbriar.service.group.GroupService;
 import com.bootcamp.blackbriar.service.user.UserService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.group.GroupResponse;
+import com.bootcamp.blackbriar.model.group.StudentGroupResponse;
 import com.bootcamp.blackbriar.model.user.GroupMemberResponse;
 
 import org.modelmapper.ModelMapper;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Type;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -27,6 +29,11 @@ public class GroupController {
   ModelMapper modelMapper;
 
   @GetMapping
+  public List<StudentGroupResponse> searchAndExplore(Principal auth) {
+    return groupService.exploreGroups(auth.getName());
+  }
+
+  @GetMapping(value = "/all")
   public List<GroupResponse> allGroups() {
     List<GroupEntity> groups = groupService.getAllGroups();
     Type withOwnerData = new TypeToken<List<GroupResponse>>(){}.getType();
