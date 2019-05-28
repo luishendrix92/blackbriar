@@ -1,6 +1,7 @@
 package com.bootcamp.blackbriar.model.user;
 
 import com.bootcamp.blackbriar.model.group.GroupEntity;
+import com.bootcamp.blackbriar.model.inbox.InboxEntity;
 import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 
 import javax.persistence.*;
@@ -22,6 +23,13 @@ public class UserEntity implements Serializable {
 
   @OneToMany(mappedBy = "student")
   private List<MembershipEntity> studyGroups = new ArrayList<MembershipEntity>();
+
+  @OneToOne(
+    fetch = FetchType.LAZY,
+    mappedBy = "subject",
+    cascade = CascadeType.ALL
+  )
+  private InboxEntity inbox;
 
   @Column(nullable = false)
   private String userId;
@@ -143,5 +151,13 @@ public class UserEntity implements Serializable {
 
   public void setStudent(boolean isStudent) {
     this.isStudent = isStudent;
+  }
+
+  public InboxEntity getInbox() {
+    return inbox;
+  }
+
+  public void setInbox(InboxEntity inbox) {
+    this.inbox = inbox;
   }
 }

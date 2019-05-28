@@ -37,8 +37,10 @@ public class UserController {
   }
 
   @GetMapping(value = "/me")
-  public String whoAmI(Principal auth) {
-    return auth.getName();
+  public UserProfile whoAmI(Principal auth) {
+    UserEntity me = userService.getUserByPublicId(auth.getName());
+
+    return modelMapper.map(me, UserProfile.class);
   }
 
   @GetMapping(value = "/{instructorUserId}/groups/owned")

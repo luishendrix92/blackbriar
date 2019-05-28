@@ -1,5 +1,7 @@
 package com.bootcamp.blackbriar.model.group;
 
+import com.bootcamp.blackbriar.model.membership.MembershipDetails;
+import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.model.user.UserEntity;
 import com.bootcamp.blackbriar.model.user.UserRest;
 
@@ -12,20 +14,27 @@ public class StudentGroupResponse {
   private String image;
   private UserRest owner;
   private boolean publicGroup = false;
-  private boolean active = true;
+  private MembershipDetails membership;
 
 
-  public StudentGroupResponse(long id, String title, String description, String image, UserEntity owner, boolean publicGroup, boolean active) {
+  public StudentGroupResponse(long id, String title, String description, String image, UserEntity owner, boolean publicGroup, MembershipEntity membership) {
     UserRest serializedOwner = new UserRest();
+    MembershipDetails serializedMembership = null;
 
     BeanUtils.copyProperties(owner, serializedOwner);
+    
+    if (membership != null) {
+      serializedMembership = new MembershipDetails();
+
+      BeanUtils.copyProperties(membership, serializedMembership);
+    }
 
     this.id = id;
     this.title = title;
     this.description = description;
     this.image = image;
     this.publicGroup = publicGroup;
-    this.active = active;
+    this.membership = serializedMembership;
     this.owner = serializedOwner;
   }
 
@@ -70,19 +79,19 @@ public class StudentGroupResponse {
     this.publicGroup = publicGroup;
   }
 
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
-  }
-
   public UserRest getOwner() {
     return owner;
   }
 
   public void setOwner(UserRest owner) {
     this.owner = owner;
+  }
+
+  public MembershipDetails getMembership() {
+    return membership;
+  }
+
+  public void setMembership(MembershipDetails membership) {
+    this.membership = membership;
   }
 }
