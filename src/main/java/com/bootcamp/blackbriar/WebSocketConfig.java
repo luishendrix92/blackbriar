@@ -19,7 +19,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
     registry.addEndpoint("/gs-guide-websocket")
-      .setAllowedOrigins("*")
+      .setAllowedOrigins("http://localhost:4200", "http://localhost:8080", "https://blackbriar.site", "https://www.blackbriar.site")
       .withSockJS();
   }
 }
