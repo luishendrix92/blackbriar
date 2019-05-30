@@ -10,5 +10,19 @@
 </head>
 <body>
   <h1>BlackBriar API</h1>
+
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  <script>
+    var socket = new SockJS('/gs-guide-websocket'); 
+    var stompClient = Stomp.over(socket);
+    var userId = 'pKk53SoSYL6MFHFM8wI51FV2lgIdKQ';
+    
+    stompClient.connect({}, function (frame) {
+        stompClient.subscribe(`/topic/${userId}`, function({ body }) {
+          alert(JSON.parse(body).content);
+        });
+    });
+  </script>
 </body>
 </html>

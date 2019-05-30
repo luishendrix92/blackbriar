@@ -40,4 +40,12 @@ public class InboxEntity implements Serializable {
   public void setMessages(List<MessageEntity> messages) {
     this.messages = messages;
   }
+
+  public UserEntity getSubject() {
+    return subject;
+  }
+
+  public void setSubject(UserEntity subject) {
+    this.subject = subject;
+  }
 }

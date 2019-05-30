@@ -4,10 +4,13 @@ import javax.persistence.EntityNotFoundException;
 
 import com.bootcamp.blackbriar.model.inbox.InboxEntity;
 import com.bootcamp.blackbriar.model.inbox.MessageEntity;
+import com.bootcamp.blackbriar.model.inbox.SocketMessage;
 import com.bootcamp.blackbriar.repository.InboxRepository;
 import com.bootcamp.blackbriar.repository.MessageRepository;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +20,12 @@ public class InboxServiceImpl implements InboxService {
 
   @Autowired
   private MessageRepository messageRepository;
+
+  @Autowired
+  private ModelMapper modelMapper;
+
+  @Autowired
+  private SimpMessagingTemplate sockets;
 
   @Override
   public MessageEntity sendMessage(String subjectId, Long actionRef, String message, String type) {
@@ -30,7 +39,12 @@ public class InboxServiceImpl implements InboxService {
     msg.setContent(message);
     msg.setInbox(inbox);
 
-    return messageRepository.save(msg);
+    MessageEntity response = messageRepository.save(msg);
+    SocketMessage socketMessage = modelMapper.map(response, SocketMessage.class);
+
+    sockets.convertAndSend("/topic/" + subjectId, socketMessage);
+
+    return response;
   }
 
   @Override
