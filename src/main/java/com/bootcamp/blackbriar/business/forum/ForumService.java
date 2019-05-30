@@ -1,11 +1,6 @@
-/**
- * User: Alexis M. Gutierrez Kinto
- * Date: 13/05/19
- */
-
 package com.bootcamp.blackbriar.business.forum;
 
-import com.bootcamp.blackbriar.converter.Converter;
+import com.bootcamp.blackbriar.converter.ForumConverter;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumModel;
 import com.bootcamp.blackbriar.repository.forum.ForumRepository;
@@ -18,15 +13,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service("service")
+@Service("serviceForum")
 public class ForumService {
     @Autowired
-    @Qualifier("repository")
+    @Qualifier("repositoryForum")
     private ForumRepository repository;
 
     @Autowired
-    @Qualifier("converter")
-    private Converter converter;
+    @Qualifier("converterForum")
+    private ForumConverter converter;
 
     private static final Log logger = LogFactory.getLog(ForumService.class);
 
@@ -34,6 +29,8 @@ public class ForumService {
         logger.info("... Creando Foro ...");
         try{
             repository.save(forum);
+
+
             logger.info("... Foro creado! ...");
             return true;
         }catch(Exception e){
@@ -42,7 +39,6 @@ public class ForumService {
         }
     }
 
-    // Falta validar si id = null o no existente
     public boolean update(ForumEntity forum, long id){
         logger.info("... Actualizando Foro ...");
         try{

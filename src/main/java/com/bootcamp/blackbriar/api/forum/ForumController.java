@@ -20,26 +20,26 @@ import java.util.List;
 public class ForumController {
 
     @Autowired
-    @Qualifier("service")
+    @Qualifier("serviceForum")
     ForumService service;
 
-    @PostMapping("/foro")
+    @PostMapping("/forum")
     public boolean addForum(@RequestBody @Valid ForumEntity forum){
 
         return service.create(forum);
     }
 
-    @PutMapping("/foro/{id}")
+    @PutMapping("/forum/{id}")
     public boolean update(@PathVariable("id") long id, @RequestBody ForumEntity forum){
         return service.update(forum, id);
     }
 
-    @DeleteMapping("/foro/{id}")
+    @DeleteMapping("/forum/{id}")
     public boolean delete(@PathVariable("id") long id){
         return service.delete(id);
     }
 
-    @GetMapping("/foro")
+    @GetMapping("/forum")
     public List<ForumModel> get(){
         return service.get();
     }
