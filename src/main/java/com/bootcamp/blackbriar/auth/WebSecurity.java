@@ -35,7 +35,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
             .applyPermitDefaultValues();
 
           config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-          onfig.setAllowCredentials(false);
+          config.setAllowCredentials(false);
           
           return config;
         })
