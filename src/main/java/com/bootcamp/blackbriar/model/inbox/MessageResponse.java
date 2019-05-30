@@ -42,7 +42,7 @@ public class MessageResponse {
     this.archived = archived;
   }
 
-  public long getActionRef() {
+  public Long getActionRef() {
     return actionRef;
   }
 

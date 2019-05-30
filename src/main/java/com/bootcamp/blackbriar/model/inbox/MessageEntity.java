@@ -54,7 +54,7 @@ public class MessageEntity implements Serializable {
     this.content = content;
   }
 
-  public long getActionRef() {
+  public Long getActionRef() {
     return actionRef;
   }
 

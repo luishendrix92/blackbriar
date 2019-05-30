@@ -1,9 +1,11 @@
 package com.bootcamp.blackbriar.service.user;
 
 import com.bootcamp.blackbriar.service.Utils;
+import com.bootcamp.blackbriar.model.inbox.InboxEntity;
 import com.bootcamp.blackbriar.model.user.GroupMemberResponse;
 import com.bootcamp.blackbriar.model.user.UserDto;
 import com.bootcamp.blackbriar.model.user.UserEntity;
+import com.bootcamp.blackbriar.repository.InboxRepository;
 import com.bootcamp.blackbriar.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   BCryptPasswordEncoder bCryptPasswordEncoder;
+
+  @Autowired
+  InboxRepository inboxRepository;
 
   @Autowired
   Utils utils;
@@ -50,6 +55,11 @@ public class UserServiceImpl implements UserService {
 
     BeanUtils.copyProperties(storedUserDetails, returnValue);
 
+    InboxEntity inbox = new InboxEntity();
+
+    inbox.setSubject(storedUserDetails);
+    inboxRepository.save(inbox);
+    
     return returnValue;
   }
 
