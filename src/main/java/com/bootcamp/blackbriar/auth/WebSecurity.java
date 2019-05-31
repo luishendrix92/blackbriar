@@ -35,6 +35,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
             .applyPermitDefaultValues();
 
           config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+          config.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:8080", "https://blackbriar.site", "https://www.blackbriar.site"));
+          config.setAllowCredentials(true);
           
           return config;
         })

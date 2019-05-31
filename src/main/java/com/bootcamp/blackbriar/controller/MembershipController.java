@@ -47,6 +47,11 @@ public class MembershipController {
     membershipService.rejectMembershipRequest(membershipId, auth.getName());
   }
 
+  @DeleteMapping(value = "/{membershipId}")
+  public String leaveOrCancel(@PathVariable long membershipId, Principal auth) {
+    return membershipService.leaveOrCancelMembership(membershipId, auth.getName());
+  }
+
   @PostMapping
   public MembershipResponse subscribe(
     @RequestBody MembershipRequest membershipRequest,

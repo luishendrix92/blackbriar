@@ -11,4 +11,6 @@ public interface MembershipService {
   MembershipEntity approveMembershipRequest(long membershipId, String instructorUserId);
 
   void rejectMembershipRequest(long membershipId, String instructorUserId);
+
+  String leaveOrCancelMembership(long membershipId, String studentUserId);
 }
