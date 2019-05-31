@@ -85,10 +85,11 @@ public class MembershipServiceImpl implements MembershipService {
   }
 
   // TODO: Make a generic validation method of type (validateApproval :: long -> String -> MembershipEntity)
+  // TODO: Send a generic notification to the instructor when a user joins a public group
   @Override
   public MembershipEntity approveMembershipRequest(long membershipId, String instructorUserId) {
     MembershipEntity toApprove = membershipRepository.findById(membershipId)
-      .orElseThrow(() -> new EntityNotFoundException("This membership does not exist."));
+      .orElseThrow(() -> new EntityNotFoundException("This membership or request does not exist."));
 
     if (toApprove.isActive()) {
       throw new RuntimeException("This membership is already active.");
@@ -133,5 +134,45 @@ public class MembershipServiceImpl implements MembershipService {
       "Your request to to join " + toDeny.getGroup().getTitle() + " has been denied.",
       "GNRIC"
     );
+  }
+
+  @Override
+  public String leaveOrCancelMembership(long membershipId, String studentUserId) {
+    MembershipEntity toRemove = membershipRepository.findById(membershipId)
+      .orElseThrow(() -> new EntityNotFoundException("This membership does not exist."));
+    String response;
+    String message;
+
+    if (!toRemove.getStudent().getUserId().equals(studentUserId)) {
+      throw new RuntimeException("You can't remove a membership that isn't yours.");
+    }
+
+    if (!toRemove.isActive()) {
+      if (toRemove.isInvitation()) {
+        response = "You have successfully declined the invitation.";
+
+        message = toRemove.getStudent().getFirstName() + " " +
+          toRemove.getStudent().getLastName() +
+          " has declined your invitation to join '" +
+          toRemove.getGroup().getTitle() + ".'";
+      } else {
+        response = "You have successfully cancelled your request.";
+        message = toRemove.getStudent().getFirstName() + " " +
+          toRemove.getStudent().getLastName() +
+          " no longer wishes to join '" +
+          toRemove.getGroup().getTitle() + ".'";
+      }
+    } else {
+      response = "You are no longer a member of '" + toRemove.getGroup().getTitle() + ".'";
+      message =  toRemove.getStudent().getFirstName() + " " +
+        toRemove.getStudent().getLastName() +
+        " has abadoned your group '" +
+        toRemove.getGroup().getTitle() + ".'";
+    }
+
+    membershipRepository.delete(toRemove);
+    inboxService.sendMessage(toRemove.getStudent().getUserId(), null, message, "GNRIC");
+
+    return response;
   }
 }
