@@ -69,7 +69,7 @@ public class ForumEntity implements Serializable {
 
     // One To One Relation with Forum Settings
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL,
+    @OneToOne(mappedBy = "forum", cascade = CascadeType.ALL,
         fetch = FetchType.LAZY, optional = false)
 
     private ForumSettingsEntity forumSettings;
@@ -156,5 +156,6 @@ public class ForumEntity implements Serializable {
     public ForumSettingsEntity getForumSettings() {
         return forumSettings;
     }
+
 }
 
