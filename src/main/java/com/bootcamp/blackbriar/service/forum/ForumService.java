@@ -1,75 +1,78 @@
 package com.bootcamp.blackbriar.service.forum;
 
-import com.bootcamp.blackbriar.converter.Converter;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
-import com.bootcamp.blackbriar.model.forum.ForumModel;
+import com.bootcamp.blackbriar.model.forum.ForumRequest;
+import com.bootcamp.blackbriar.model.forum.ForumSettingsEntity;
+import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.repository.ForumRepository;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.bootcamp.blackbriar.repository.ForumSettingsRepository;
+import com.bootcamp.blackbriar.repository.GroupRepository;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service("service")
+// import java.util.List;
+
+import javax.persistence.EntityNotFoundException;
+
+@Service
 public class ForumService {
-    @Autowired
-    @Qualifier("repository")
-    private ForumRepository repository;
+  @Autowired
+  ForumRepository forumRepository;
 
-    @Autowired
-    @Qualifier("converter")
-    private Converter converter;
+  @Autowired
+  ForumSettingsRepository settingsRepository;
 
-    private static final Log logger = LogFactory.getLog(ForumService.class);
+  @Autowired
+  GroupRepository groupRepository;
 
-    public boolean create(ForumEntity forum){
-        logger.info("... Creando Foro ...");
-        try{
-            repository.save(forum);
-            logger.info("... Foro creado! ...");
-            return true;
-        }catch(Exception e){
-            logger.error("... Error al crear foro");
-            return false;
-        }
+  @Autowired
+  ModelMapper modelMapper;
+
+  public ForumEntity fetchForum(long forumId) {
+    return forumRepository.findById(forumId)
+      .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
+  }
+
+  public ForumEntity createForum(long groupId, ForumRequest forumDetails, String instructorId) {
+    GroupEntity group = groupRepository.findById(groupId)
+      .orElseThrow(() -> new EntityNotFoundException(""));
+    
+    if (!group.getOwner().getUserId().equals(instructorId)) {
+      throw new RuntimeException("Only group owners can add forum activities to them.");
     }
 
-    // Falta validar si id = null o no existente
-    public boolean update(ForumEntity forum, long id){
-        logger.info("... Actualizando Foro ...");
-        try{
-            ForumEntity forumNew = repository.findById(id);
-            if ( forumNew == null)
-            {
-                logger.info("No forum with id = " + id);
-            }
-            forum.setId(id);
-            repository.save(forum);
-            logger.info("... Foro actualizado! ...");
-            return true;
-        }catch(Exception e){
-            logger.error("... Error al actualizar foro ...");
-            return false;
-        }
+    ForumEntity forum = modelMapper.map(forumDetails, ForumEntity.class);
+    ForumSettingsEntity settings;
+
+    forum.setGroup(group);
+
+    forum = forumRepository.save(forum);
+    settings = modelMapper.map(forumDetails, ForumSettingsEntity.class);
+
+    settings.setForum(forum);
+    settingsRepository.save(settings);
+    forum.setSettings(settings);
+
+    return forum;
+  }
+
+  public void removeForum(long forumId, String instructorId) {
+    ForumEntity toRemove = forumRepository.findById(forumId)
+      .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
+    
+    if (!toRemove.getGroup().getOwner().getUserId().equals(instructorId)) {
+      throw new RuntimeException("You are not allowed to delete forums that you didn't create.");
     }
 
-    public boolean delete(long id){
-        logger.info("... Eliminando Foro ...");
-        try{
-            ForumEntity forum = repository.findById(id);
-            repository.delete(forum);
-            logger.info("... Foro elimado! ...");
-            return true;
-        }catch(Exception e){
-            logger.error("... Error al eliminar foro ...");
-            return false;
-        }
-    }
+    forumRepository.delete(toRemove);
+  }
 
-    public List<ForumModel> get(){
-        return converter.convertList(repository.findAll());
-    }
+  public List<ForumEntity> getForumsByGroup(long groupId) {
+    return forumRepository.findByGroupId(groupId);
+  }
 }
 
