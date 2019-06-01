@@ -1,42 +1,55 @@
 package com.bootcamp.blackbriar.controller;
 
+import com.bootcamp.blackbriar.model.forum.ForumRequest;
 import com.bootcamp.blackbriar.service.forum.ForumService;
+
+import java.lang.reflect.Type;
+import java.security.Principal;
+
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
-import com.bootcamp.blackbriar.model.forum.ForumModel;
+import com.bootcamp.blackbriar.model.forum.ForumResponse;
+
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
 public class ForumController {
+  @Autowired
+  ForumService forumService;
 
-    @Autowired
-    @Qualifier("service")
-    ForumService service;
+  @Autowired
+  ModelMapper modelMapper;
 
-    @PostMapping("/foro")
-    public boolean addForum(@RequestBody @Valid ForumEntity forum){
+  @GetMapping(value = "/api/forums/{forumId}")
+  public ForumResponse getForumDetails(@PathVariable long forumId) {
+    return modelMapper.map(forumService.fetchForum(forumId), ForumResponse.class);
+  }
 
-        return service.create(forum);
-    }
+  @GetMapping(value = "/api/groups/{groupId}/forums")
+  public List<ForumResponse> listGroupForums(@PathVariable long groupId) {
+    List<ForumEntity> groupForums = forumService.getForumsByGroup(groupId);
+    Type withOwnerData = new TypeToken<List<ForumResponse>>(){}.getType();
+    
+    return modelMapper.map(groupForums, withOwnerData);
+  }
 
-    @PutMapping("/foro/{id}")
-    public boolean update(@PathVariable("id") long id, @RequestBody ForumEntity forum){
-        return service.update(forum, id);
-    }
+  @PostMapping(value = "/api/groups/{groupId}/forums")
+  public ForumResponse postMethodName(
+    @PathVariable long groupId,
+    @RequestBody ForumRequest forumDetails,
+    Principal auth
+  ) {
+    ForumEntity forum = forumService.createForum(groupId, forumDetails, auth.getName());
 
-    @DeleteMapping("/foro/{id}")
-    public boolean delete(@PathVariable("id") long id){
-        return service.delete(id);
-    }
+    return modelMapper.map(forum, ForumResponse.class);
+  }
 
-    @GetMapping("/foro")
-    public List<ForumModel> get(){
-        return service.get();
-    }
-
+  @DeleteMapping(value = "/api/forums/{forumId}")
+  public void delete(@PathVariable long forumId, Principal auth) {
+    forumService.removeForum(forumId, auth.getName());
+  }
 }

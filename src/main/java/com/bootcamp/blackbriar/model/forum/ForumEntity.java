@@ -1,61 +1,133 @@
 package com.bootcamp.blackbriar.model.forum;
 
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
+import com.bootcamp.blackbriar.model.group.GroupEntity;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.UpdateTimestamp;
 
-@Table(name = "forum")
-@Entity
+@Entity(name = "Forum")
 public class ForumEntity implements Serializable {
-    private static final long serialVersionUID = -2984991408087361106L;
+  private static final long serialVersionUID = 8942673069650119087L;
 
-    public ForumEntity() {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    }
+  @Column(nullable = false, length = 200)
+  private String title;
 
-    public ForumEntity(long id, String title, String description) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-    }
+  private String description;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private long id;
+  @Column(nullable = false)
+  private String content;
 
-    @Column(name = "title" , nullable = false, length = 100)
-    private String title;
+  @Column(nullable = false)
+  private boolean visible = true;
 
-    @Column(name = "description", nullable = false, length = 1000)
-    private String description;
+  @CreationTimestamp
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created;
 
-    public long getId() {
-        return id;
-    }
+  @UpdateTimestamp
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date updated;
 
-    public void setId(long id) {
-        this.id = id;
-    }
+  /**
+   * Many to One Relationship: [Forum]<<-[Group]
+   * ===========================================
+   * A forum activity belongs to a group.
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @JoinColumn(name = "fk_group")
+  private GroupEntity group;
 
-    public String getTitle() {
-        return title;
-    }
+  /**
+   * One to One Relationship: [Forum]->[ForumSettings]
+   * =================================================
+   * A forum activity has a set of settings and config
+   * variables that can be changed by the group owner.
+   */
+  @OneToOne(
+    fetch = FetchType.LAZY,
+    mappedBy = "forum",
+    cascade = CascadeType.ALL
+  )
+  private ForumSettingsEntity settings;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+  public long getId() {
+    return id;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public void setId(long id) {
+    this.id = id;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getContent() {
+    return content;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
+
+  public boolean isVisible() {
+    return visible;
+  }
+
+  public void setVisible(boolean visible) {
+    this.visible = visible;
+  }
+
+  public Date getCreated() {
+    return created;
+  }
+
+  public void setCreated(Date created) {
+    this.created = created;
+  }
+
+  public Date getUpdated() {
+    return updated;
+  }
+
+  public void setUpdated(Date updated) {
+    this.updated = updated;
+  }
+
+  public GroupEntity getGroup() {
+    return group;
+  }
+
+  public void setGroup(GroupEntity group) {
+    this.group = group;
+  }
+
+  public ForumSettingsEntity getSettings() {
+    return settings;
+  }
+
+  public void setSettings(ForumSettingsEntity settings) {
+    this.settings = settings;
+  }
 }

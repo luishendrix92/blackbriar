@@ -1,17 +1,14 @@
 package com.bootcamp.blackbriar.repository;
 
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.io.Serializable;
+import java.util.List;
 
-@Repository("repository")
-public interface ForumRepository extends JpaRepository<ForumEntity, Serializable>{
+@Repository
+public interface ForumRepository extends CrudRepository<ForumEntity, Long> {
+  List<ForumEntity> findByGroupId(long groupId);
 
-//    public abstract List<ForumEntity> findByTitle(String title);
-
-//    ForumEntity findByTitle(String title);
-
-    ForumEntity findById(long id);
+  List<ForumEntity> findByGroupIdAndVisible(long groupId, boolean isVisible);
 }
