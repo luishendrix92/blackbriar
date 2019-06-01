@@ -1,5 +1,6 @@
 package com.bootcamp.blackbriar.model.group;
 
+import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.model.user.UserEntity;
 
@@ -21,6 +22,15 @@ public class GroupEntity implements Serializable {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_user")
   private UserEntity owner;
+
+  /**
+   * One to Many Relationship: [Group]->>[Forum]
+   * ===========================================
+   * Study groups can have one or more forum
+   * activities listed and never shared.
+   */
+  @OneToMany(mappedBy = "group")
+  private List<ForumEntity> forums = new ArrayList<ForumEntity>();
 
   @OneToMany(mappedBy = "group")
   private List<MembershipEntity> members = new ArrayList<MembershipEntity>();
