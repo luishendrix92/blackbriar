@@ -26,7 +26,7 @@ public class ForumEntity implements Serializable {
   private String content;
 
   @Column(nullable = false)
-  private boolean visible = true;
+  private boolean published = false;
 
   @CreationTimestamp
   @Temporal(TemporalType.TIMESTAMP)
@@ -91,14 +91,6 @@ public class ForumEntity implements Serializable {
     this.content = content;
   }
 
-  public boolean isVisible() {
-    return visible;
-  }
-
-  public void setVisible(boolean visible) {
-    this.visible = visible;
-  }
-
   public Date getCreated() {
     return created;
   }
@@ -129,5 +121,13 @@ public class ForumEntity implements Serializable {
 
   public void setSettings(ForumSettingsEntity settings) {
     this.settings = settings;
+  }
+
+  public boolean isPublished() {
+    return published;
+  }
+
+  public void setPublished(boolean published) {
+    this.published = published;
   }
 }

@@ -5,18 +5,10 @@ import java.util.Date;
 public class ForumSettingsDetails {
   private Date startDate;
   private Date endDate;
-  private int fighterPoints;
+  private int warriorPoints;
   private int healerPoints;
-  private int bloodmagePoints;
+  private int warlockPoints;
   private int validResponsePoints;
-
-  public Date getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(Date startDate) {
-    this.startDate = startDate;
-  }
 
   public Date getEndDate() {
     return endDate;
@@ -24,14 +16,6 @@ public class ForumSettingsDetails {
 
   public void setEndDate(Date endDate) {
     this.endDate = endDate;
-  }
-
-  public int getFighterPoints() {
-    return fighterPoints;
-  }
-
-  public void setFighterPoints(int fighterPoints) {
-    this.fighterPoints = fighterPoints;
   }
 
   public int getHealerPoints() {
@@ -42,19 +26,35 @@ public class ForumSettingsDetails {
     this.healerPoints = healerPoints;
   }
 
-  public int getBloodmagePoints() {
-    return bloodmagePoints;
-  }
-
-  public void setBloodmagePoints(int bloodmagePoints) {
-    this.bloodmagePoints = bloodmagePoints;
-  }
-
   public int getValidResponsePoints() {
     return validResponsePoints;
   }
 
   public void setValidResponsePoints(int validResponsePoints) {
     this.validResponsePoints = validResponsePoints;
+  }
+
+  public int getWarriorPoints() {
+    return warriorPoints;
+  }
+
+  public void setWarriorPoints(int warriorPoints) {
+    this.warriorPoints = warriorPoints;
+  }
+
+  public int getWarlockPoints() {
+    return warlockPoints;
+  }
+
+  public void setWarlockPoints(int warlockPoints) {
+    this.warlockPoints = warlockPoints;
+  }
+
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
   }
 }
