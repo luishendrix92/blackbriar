@@ -9,7 +9,7 @@ public class ForumResponse {
   private String title;
   private String description;
   private String content;
-  private boolean visible = true;
+  private boolean published = false;
   private Date created;
   private ForumSettingsDetails settings;
   private InstructorGroupResponse group;
@@ -46,14 +46,6 @@ public class ForumResponse {
     this.content = content;
   }
 
-  public boolean isVisible() {
-    return visible;
-  }
-
-  public void setVisible(boolean visible) {
-    this.visible = visible;
-  }
-
   public Date getCreated() {
     return created;
   }
@@ -76,5 +68,13 @@ public class ForumResponse {
 
   public void setGroup(InstructorGroupResponse group) {
     this.group = group;
+  }
+
+  public boolean isPublished() {
+    return published;
+  }
+
+  public void setPublished(boolean published) {
+    this.published = published;
   }
 }

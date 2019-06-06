@@ -10,5 +10,5 @@ import java.util.List;
 public interface ForumRepository extends CrudRepository<ForumEntity, Long> {
   List<ForumEntity> findByGroupId(long groupId);
 
-  List<ForumEntity> findByGroupIdAndVisible(long groupId, boolean isVisible);
+  List<ForumEntity> findByGroupIdAndPublished(long groupId, boolean isPublished);
 }

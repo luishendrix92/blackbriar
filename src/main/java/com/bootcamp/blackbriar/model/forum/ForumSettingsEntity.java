@@ -13,7 +13,7 @@ public class ForumSettingsEntity implements Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   @Temporal(TemporalType.TIMESTAMP)
   private Date startDate;
 
@@ -22,13 +22,13 @@ public class ForumSettingsEntity implements Serializable {
   private Date endDate;
 
   @Column(nullable = false)
-  private int fighterPoints;
+  private int warriorPoints;
 
   @Column(nullable = false)
   private int healerPoints;
 
   @Column(nullable = false)
-  private int bloodmagePoints;
+  private int warlockPoints;
 
   @Column(nullable = false)
   private int validResponsePoints;
@@ -67,12 +67,12 @@ public class ForumSettingsEntity implements Serializable {
     this.endDate = endDate;
   }
 
-  public int getFighterPoints() {
-    return fighterPoints;
+  public int getWarriorPoints() {
+    return warriorPoints;
   }
 
-  public void setFighterPoints(int fighterPoints) {
-    this.fighterPoints = fighterPoints;
+  public void setWarriorPoints(int warriorPoints) {
+    this.warriorPoints = warriorPoints;
   }
 
   public int getHealerPoints() {
@@ -83,12 +83,12 @@ public class ForumSettingsEntity implements Serializable {
     this.healerPoints = healerPoints;
   }
 
-  public int getBloodmagePoints() {
-    return bloodmagePoints;
+  public int getWarlockPoints() {
+    return warlockPoints;
   }
 
-  public void setBloodmagePoints(int bloodmagePoints) {
-    this.bloodmagePoints = bloodmagePoints;
+  public void setWarlockPoints(int warlockPoints) {
+    this.warlockPoints = warlockPoints;
   }
 
   public int getValidResponsePoints() {

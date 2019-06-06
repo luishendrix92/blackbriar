@@ -7,14 +7,13 @@ public class ForumRequest {
   private String title;
   private String description;
   private String content;
-  private boolean visible = true;
+  private boolean published = false;
 
   // Settings Entity Properties
-  private Date startDate;
   private Date endDate;
-  private int fighterPoints;
+  private int warriorPoints;
   private int healerPoints;
-  private int bloodmagePoints;
+  private int warlockPoints;
   private int validResponsePoints;
 
   public String getTitle() {
@@ -41,36 +40,12 @@ public class ForumRequest {
     this.content = content;
   }
 
-  public boolean isVisible() {
-    return visible;
-  }
-
-  public void setVisible(boolean visible) {
-    this.visible = visible;
-  }
-
-  public Date getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(Date startDate) {
-    this.startDate = startDate;
-  }
-
   public Date getEndDate() {
     return endDate;
   }
 
   public void setEndDate(Date endDate) {
     this.endDate = endDate;
-  }
-
-  public int getFighterPoints() {
-    return fighterPoints;
-  }
-
-  public void setFighterPoints(int fighterPoints) {
-    this.fighterPoints = fighterPoints;
   }
 
   public int getHealerPoints() {
@@ -81,19 +56,35 @@ public class ForumRequest {
     this.healerPoints = healerPoints;
   }
 
-  public int getBloodmagePoints() {
-    return bloodmagePoints;
-  }
-
-  public void setBloodmagePoints(int bloodmagePoints) {
-    this.bloodmagePoints = bloodmagePoints;
-  }
-
   public int getValidResponsePoints() {
     return validResponsePoints;
   }
 
   public void setValidResponsePoints(int validResponsePoints) {
     this.validResponsePoints = validResponsePoints;
+  }
+
+  public boolean isPublished() {
+    return published;
+  }
+
+  public void setPublished(boolean published) {
+    this.published = published;
+  }
+
+  public int getWarriorPoints() {
+    return warriorPoints;
+  }
+
+  public void setWarriorPoints(int warriorPoints) {
+    this.warriorPoints = warriorPoints;
+  }
+
+  public int getWarlockPoints() {
+    return warlockPoints;
+  }
+
+  public void setWarlockPoints(int warlockPoints) {
+    this.warlockPoints = warlockPoints;
   }
 }
