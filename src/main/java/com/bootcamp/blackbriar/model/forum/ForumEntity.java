@@ -3,7 +3,11 @@ package com.bootcamp.blackbriar.model.forum;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import com.bootcamp.blackbriar.model.membershipForum.MembershipForumEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -19,6 +23,14 @@ public class ForumEntity implements Serializable {
 
   @Column(nullable = false, length = 200)
   private String title;
+
+  public List<MembershipForumEntity> getMembers() {
+    return members;
+  }
+
+  public void setMembers(List<MembershipForumEntity> members) {
+    this.members = members;
+  }
 
   private String description;
 
@@ -58,6 +70,10 @@ public class ForumEntity implements Serializable {
     cascade = CascadeType.ALL
   )
   private ForumSettingsEntity settings;
+
+  /**One to Many Relationship: Forum -> membershipF **/
+  @OneToMany(mappedBy = "forum")
+  private List<MembershipForumEntity> members = new ArrayList<MembershipForumEntity>();
 
   public long getId() {
     return id;
