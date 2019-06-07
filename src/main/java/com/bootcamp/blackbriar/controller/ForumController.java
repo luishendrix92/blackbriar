@@ -30,11 +30,11 @@ public class ForumController {
   }
 
   @GetMapping(value = "/api/groups/{groupId}/forums")
-  public List<ForumResponse> listGroupForums(@PathVariable long groupId) {
-    List<ForumEntity> groupForums = forumService.getForumsByGroup(groupId);
-    Type withOwnerData = new TypeToken<List<ForumResponse>>(){}.getType();
+  public List<ForumResponse> listGroupForums(@PathVariable long groupId, Principal auth) {
+    List<ForumEntity> groupForums = forumService.getForumsByGroup(groupId, auth.getName());
+    Type forumList = new TypeToken<List<ForumResponse>>(){}.getType();
     
-    return modelMapper.map(groupForums, withOwnerData);
+    return modelMapper.map(groupForums, forumList);
   }
 
   @PostMapping(value = "/api/groups/{groupId}/forums")
