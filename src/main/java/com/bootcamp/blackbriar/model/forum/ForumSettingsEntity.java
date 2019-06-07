@@ -1,6 +1,10 @@
 package com.bootcamp.blackbriar.model.forum;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -40,6 +44,7 @@ public class ForumSettingsEntity implements Serializable {
    * to a single forum activity.
    */
   @OneToOne(optional = false, fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "fk_forum")
   private ForumEntity forum;
 
