@@ -71,8 +71,15 @@ public class ForumService {
     forumRepository.delete(toRemove);
   }
 
-  public List<ForumEntity> getForumsByGroup(long groupId) {
-    return forumRepository.findByGroupId(groupId);
+  public List<ForumEntity> getForumsByGroup(long groupId, String userId) {
+    GroupEntity group = groupRepository.findById(groupId)
+      .orElseThrow(() -> new EntityNotFoundException("Group not found."));
+    
+    if (group.getOwner().getUserId().equals(userId)) {
+      return forumRepository.findByGroupId(groupId);
+    } else {
+      return forumRepository.findByGroupIdAndPublished(groupId, true);
+    }
   }
 }
 
