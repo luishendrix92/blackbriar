@@ -12,25 +12,27 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
-
-// import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
 
 @Service
 public class ForumService {
   @Autowired
-  ForumRepository forumRepository;
+  private ForumRepository forumRepository;
 
   @Autowired
-  ForumSettingsRepository settingsRepository;
+  private ForumSettingsRepository settingsRepository;
 
   @Autowired
-  GroupRepository groupRepository;
+  private ForumRoleService roleService;
 
   @Autowired
-  ModelMapper modelMapper;
+  private GroupRepository groupRepository;
+
+  @Autowired
+  private ModelMapper modelMapper;
 
   public ForumEntity fetchForum(long forumId) {
     return forumRepository.findById(forumId)
@@ -39,7 +41,7 @@ public class ForumService {
 
   public ForumEntity createForum(long groupId, ForumRequest forumDetails, String instructorId) {
     GroupEntity group = groupRepository.findById(groupId)
-      .orElseThrow(() -> new EntityNotFoundException(""));
+      .orElseThrow(() -> new EntityNotFoundException("This group does not exist."));
     
     if (!group.getOwner().getUserId().equals(instructorId)) {
       throw new RuntimeException("Only group owners can add forum activities to them.");
@@ -81,5 +83,33 @@ public class ForumService {
       return forumRepository.findByGroupIdAndPublished(groupId, true);
     }
   }
-}
 
+  public ForumEntity publishForum(long forumId, String instructorId) {
+    ForumEntity forum = forumRepository.findById(forumId)
+      .orElseThrow(() -> new EntityNotFoundException("Forum not found."));
+    ForumSettingsEntity settings = forum.getSettings();
+    
+    if (forum.isPublished()) {
+      throw new RuntimeException("This forum has already started.");
+    }
+    
+    if (!forum.getGroup().getOwner().getUserId().equals(instructorId)) {
+      throw new RuntimeException("Only forum owners can publish them.");
+    }
+    
+    if (settings.getEndDate().getTime() <= new Date().getTime()) {
+      throw new RuntimeException("This forum has already ended.");
+    }
+
+    if (forum.getGroup().getMembers().size() == 0) {
+      throw new RuntimeException("The group has no members yet.");
+    }
+
+    roleService.assignRoles(forum);
+    forum.setPublished(true);
+    settings.setStartDate(new Date());
+    settingsRepository.save(settings);
+
+    return forumRepository.save(forum);
+  }
+}

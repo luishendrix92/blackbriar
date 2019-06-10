@@ -9,10 +9,17 @@ import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-@Entity(name = "MembershipForum")
-@Table(name = "membershipForum")
+@Entity(name = "ForumMembership")
+@Table(name = "membershipf")
 public class FMembershipEntity implements Serializable {
   private static final long serialVersionUID = 6045506483957768888L;
+
+  public FMembershipEntity(MembershipEntity member, ForumEntity forum) {
+    this.member = member;
+    this.forum = forum;
+  }
+
+  public FMembershipEntity() {}
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +36,7 @@ public class FMembershipEntity implements Serializable {
   private ForumEntity forum;
 
   @Column(nullable = false)
-  private boolean warior = false;
+  private boolean warrior = false;
 
   @Column(nullable = false)
   private boolean healer = false;
@@ -64,14 +71,6 @@ public class FMembershipEntity implements Serializable {
     this.forum = forum;
   }
 
-  public boolean isWarior() {
-    return warior;
-  }
-
-  public void setWarior(boolean warior) {
-    this.warior = warior;
-  }
-
   public boolean isHealer() {
     return healer;
   }
@@ -94,5 +93,13 @@ public class FMembershipEntity implements Serializable {
 
   public void setScore(int score) {
     this.score = score;
+  }
+
+  public boolean isWarrior() {
+    return warrior;
+  }
+
+  public void setWarrior(boolean warrior) {
+    this.warrior = warrior;
   }
  }

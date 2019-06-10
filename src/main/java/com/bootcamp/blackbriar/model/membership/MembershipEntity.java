@@ -72,4 +72,12 @@ public class MembershipEntity implements Serializable {
   public void setInvitation(boolean invitation) {
     this.invitation = invitation;
   }
+
+  public List<FMembershipEntity> getForums() {
+    return forums;
+  }
+
+  public void setForums(List<FMembershipEntity> forums) {
+    this.forums = forums;
+  }
 }

@@ -48,6 +48,14 @@ public class ForumController {
     return modelMapper.map(forum, ForumResponse.class);
   }
 
+  @PutMapping(value = "/api/forums/{forumId}/publish")
+  public ForumResponse startActivity(@PathVariable long forumId, Principal auth) {
+    ForumEntity startedForum = forumService.publishForum(forumId, auth.getName());
+    startedForum = forumService.fetchForum(forumId);
+
+    return modelMapper.map(startedForum, ForumResponse.class);
+  }
+
   @DeleteMapping(value = "/api/forums/{forumId}")
   public void delete(@PathVariable long forumId, Principal auth) {
     forumService.removeForum(forumId, auth.getName());

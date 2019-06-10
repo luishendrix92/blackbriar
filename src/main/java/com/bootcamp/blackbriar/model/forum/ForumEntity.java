@@ -62,6 +62,13 @@ public class ForumEntity implements Serializable {
   )
   private ForumSettingsEntity settings;
 
+  /**
+   * One to Many Relationship: [Forum]->>[ForumMembership]
+   * =====================================================
+   * Forums automatically assign roles and an initial
+   * score to all active group members. This state is
+   * kept in an entity called ForumMembership.
+   */
   @OneToMany(mappedBy = "forum")
   private List<FMembershipEntity> roles = new ArrayList<FMembershipEntity>();
 
@@ -135,5 +142,13 @@ public class ForumEntity implements Serializable {
 
   public void setPublished(boolean published) {
     this.published = published;
+  }
+
+  public List<FMembershipEntity> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(List<FMembershipEntity> roles) {
+    this.roles = roles;
   }
 }
