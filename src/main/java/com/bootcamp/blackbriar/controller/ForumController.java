@@ -38,15 +38,19 @@ public class ForumController {
   }
 
   @PostMapping(value = "/api/groups/{groupId}/forums")
-  public ForumResponse postMethodName(
+  public ForumResponse createForum(
     @PathVariable long groupId,
     @RequestBody ForumRequest forumDetails,
     Principal auth
   ) {
+
+    
     ForumEntity forum = forumService.createForum(groupId, forumDetails, auth.getName());
+    
 
     return modelMapper.map(forum, ForumResponse.class);
   }
+
 
   @PutMapping(value = "/api/forums/{forumId}/publish")
   public ForumResponse startActivity(@PathVariable long forumId, Principal auth) {

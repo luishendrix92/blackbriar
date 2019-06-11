@@ -1,5 +1,6 @@
 package com.bootcamp.blackbriar.service.forum;
 
+import com.bootcamp.blackbriar.model.forum.FMembershipEntity;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumRequest;
 import com.bootcamp.blackbriar.model.forum.ForumSettingsEntity;
@@ -36,13 +37,13 @@ public class ForumService {
 
   public ForumEntity fetchForum(long forumId) {
     return forumRepository.findById(forumId)
-      .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
+        .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
   }
 
   public ForumEntity createForum(long groupId, ForumRequest forumDetails, String instructorId) {
     GroupEntity group = groupRepository.findById(groupId)
-      .orElseThrow(() -> new EntityNotFoundException("This group does not exist."));
-    
+        .orElseThrow(() -> new EntityNotFoundException("This group does not exist."));
+
     if (!group.getOwner().getUserId().equals(instructorId)) {
       throw new RuntimeException("Only group owners can add forum activities to them.");
     }
@@ -57,6 +58,15 @@ public class ForumService {
 
     settings.setForum(forum);
     settingsRepository.save(settings);
+    
+
+    if (forum.isPublished()) {
+      settings.setStartDate(new Date());
+      settings =  settingsRepository.save(settings);
+      List<FMembershipEntity> forumGroupMembers = roleService.createMembershipForum(forum);
+      forum.setRoles(forumGroupMembers);
+    }
+
     forum.setSettings(settings);
 
     return forum;
@@ -105,7 +115,7 @@ public class ForumService {
       throw new RuntimeException("The group has no members yet.");
     }
 
-    roleService.assignRoles(forum);
+    roleService.createMembershipForum(forum);
     forum.setPublished(true);
     settings.setStartDate(new Date());
     settingsRepository.save(settings);

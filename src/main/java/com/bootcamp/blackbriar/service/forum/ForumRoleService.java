@@ -17,16 +17,27 @@ public class ForumRoleService {
   @Autowired
   private FMembershipRepository roleRepository;
 
-  public List<FMembershipEntity> assignRoles(ForumEntity forum) {
+  public List<FMembershipEntity> createMembershipForum(ForumEntity forum) {
     List<MembershipEntity> forumGroupMembers = forum.getGroup().getMembers();
     int groupMemberCount = forumGroupMembers.size();
-    int healerAmount  = (int) Math.ceil(groupMemberCount * 0.30);
-    int warriorAmount = (int) Math.ceil(groupMemberCount * 0.20);
-    int warlockAmount = (int) Math.floor(groupMemberCount * 0.20);
+   
     List<FMembershipEntity> forumMembers = forumGroupMembers.stream()
       .filter(groupMember -> groupMember.isActive())
       .map(activeMember -> new FMembershipEntity(activeMember, forum))
       .collect(Collectors.toList());
+
+    if(forum.isPublished()){
+      forumMembers = assignRoles(forumMembers, groupMemberCount);
+    }
+   
+    
+    return (List<FMembershipEntity>) roleRepository.saveAll(forumMembers);
+  }
+
+  public List<FMembershipEntity> assignRoles(List<FMembershipEntity> forumMembers, int groupMemberCount){
+    int healerAmount  = (int) Math.ceil(groupMemberCount * 0.30);
+    int warriorAmount = (int) Math.ceil(groupMemberCount * 0.20);
+    int warlockAmount = (int) Math.floor(groupMemberCount * 0.20);
 
     actionAtRandom(
       forumMembers,
@@ -45,10 +56,10 @@ public class ForumRoleService {
       forumMember -> forumMember.setWarlock(true),
       warlockAmount > 0 ? warlockAmount : 1
     );
-    
-    return (List<FMembershipEntity>) roleRepository.saveAll(forumMembers);
+    return forumMembers;
   }
 
+  /*
   private <T> void actionAtRandom(List<T> source, Consumer<T> action, int amount) {
     int sourceCount = source.size();
 
@@ -69,4 +80,22 @@ public class ForumRoleService {
       amount - 1
     );
   }
+  */
+  private <T> void actionAtRandom(List<T> source, Consumer<T> action, int amount){
+    int sourceCount = source.size(), pickedIndex = 0;
+
+    while(sourceCount>0 && amount>0){
+      pickedIndex = (int) Math.floor(Math.random() * sourceCount);
+      T pickedItem = source.get(pickedIndex);
+
+      action.accept(pickedItem);
+
+      source = source.stream()
+      .filter(item -> item != pickedItem)
+      .collect(Collectors.toList()); 
+      amount --;
+      sourceCount --;
+
+    }
+  } 
 }
