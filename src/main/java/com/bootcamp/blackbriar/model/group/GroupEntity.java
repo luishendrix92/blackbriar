@@ -32,6 +32,13 @@ public class GroupEntity implements Serializable {
   @OneToMany(mappedBy = "group")
   private List<ForumEntity> forums = new ArrayList<ForumEntity>();
 
+  /**
+   * Many to Many Relationship: [Group]<<->>[User]
+   * =============================================
+   * A study group has a list of users that have
+   * decided to join it. This relationship goes
+   * through an extra entity called Membership.
+   */
   @OneToMany(mappedBy = "group")
   private List<MembershipEntity> members = new ArrayList<MembershipEntity>();
 

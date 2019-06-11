@@ -3,7 +3,10 @@ package com.bootcamp.blackbriar.model.forum;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -58,6 +61,17 @@ public class ForumEntity implements Serializable {
     cascade = CascadeType.ALL
   )
   private ForumSettingsEntity settings;
+
+  /**
+   * One to Many Relationship: [Forum]->>[ForumMembership]
+   * =====================================================
+   * Forums automatically assign roles and an initial
+   * score to all active group members. This state is
+   * kept in an entity called ForumMembership.
+   */
+  @OneToMany(mappedBy = "forum")
+  // @OrderBy(value = "score")
+  private List<FMembershipEntity> scoreboard = new ArrayList<FMembershipEntity>();
 
   public long getId() {
     return id;
@@ -129,5 +143,13 @@ public class ForumEntity implements Serializable {
 
   public void setPublished(boolean published) {
     this.published = published;
+  }
+
+  public List<FMembershipEntity> getScoreboard() {
+    return scoreboard;
+  }
+
+  public void setScoreboard(List<FMembershipEntity> scoreboard) {
+    this.scoreboard = scoreboard;
   }
 }

@@ -1,16 +1,12 @@
 package com.bootcamp.blackbriar.model.membership;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+import com.bootcamp.blackbriar.model.forum.FMembershipEntity;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.user.UserEntity;
 
@@ -33,6 +29,9 @@ public class MembershipEntity implements Serializable {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_group")
   private GroupEntity group;
+
+  @OneToMany(mappedBy = "member")
+  private List<FMembershipEntity> forums = new ArrayList<FMembershipEntity>();
 
   public long getId() {
     return id;
@@ -72,5 +71,13 @@ public class MembershipEntity implements Serializable {
 
   public void setInvitation(boolean invitation) {
     this.invitation = invitation;
+  }
+
+  public List<FMembershipEntity> getForums() {
+    return forums;
+  }
+
+  public void setForums(List<FMembershipEntity> forums) {
+    this.forums = forums;
   }
 }
