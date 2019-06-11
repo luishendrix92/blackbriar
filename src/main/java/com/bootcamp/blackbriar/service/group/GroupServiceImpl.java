@@ -30,44 +30,32 @@ public class GroupServiceImpl implements GroupService {
 
     group.setOwner(groupOwner);
 
-    GroupEntity newGroup = groupRepository.save(group);
-
-    return newGroup;
+    return groupRepository.save(group);
   }
 
   @Override
   public List<GroupEntity> getAllGroups() {
-    List<GroupEntity> groups = (List<GroupEntity>) groupRepository.findAll();
-
-    return groups;
+    return (List<GroupEntity>) groupRepository.findAll();
   }
 
   @Override
   public List<GroupEntity> getInstructorGroups(String instructorUserId) {
-    List<GroupEntity> groups = groupRepository.findByOwnerUserId(instructorUserId);
-
-    return groups;
+    return groupRepository.findByOwnerUserId(instructorUserId);
   }
 
   @Override
   public List<StudentGroupResponse> getStudentGroups(String studentUserId) {
-    List<StudentGroupResponse> groups = groupRepository.findByStudentUserId(studentUserId);
-
-    return groups;
+    return groupRepository.findByStudentUserId(studentUserId);
   }
 
   @Override
   public GroupEntity getGroup(long groupId) {
-    GroupEntity group = groupRepository.findById(groupId)
+    return groupRepository.findById(groupId)
       .orElseThrow(() -> new EntityNotFoundException("This group was removed or doesn't exist."));
-
-    return group;
   }
 
   @Override
   public List<StudentGroupResponse> exploreGroups(String userId) {
-    List<StudentGroupResponse> groups = groupRepository.getGroupsWithMembershipDetails(userId);
-
-    return groups;
+    return groupRepository.getGroupsWithMembershipDetails(userId);
   }
 }
