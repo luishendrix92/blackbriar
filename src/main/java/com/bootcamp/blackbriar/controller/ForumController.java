@@ -1,11 +1,16 @@
 package com.bootcamp.blackbriar.controller;
 
 import com.bootcamp.blackbriar.model.forum.ForumRequest;
+import com.bootcamp.blackbriar.service.answer.AnswerService;
 import com.bootcamp.blackbriar.service.forum.ForumService;
 
 import java.lang.reflect.Type;
 import java.security.Principal;
 
+import com.bootcamp.blackbriar.model.answer.AnswerEntity;
+import com.bootcamp.blackbriar.model.answer.AnswerRequest;
+import com.bootcamp.blackbriar.model.answer.AnswerResponse;
+import com.bootcamp.blackbriar.model.feedback.FeedbackResponse;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumResponse;
 
@@ -17,12 +22,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-public class ForumController {
+public class ForumController{
   @Autowired
   ForumService forumService;
 
   @Autowired
   ModelMapper modelMapper;
+
+  @Autowired
+  AnswerService answerService;
 
   @GetMapping(value = "/api/forums/{forumId}")
   public ForumResponse getForumDetails(@PathVariable long forumId) {
@@ -64,4 +72,32 @@ public class ForumController {
   public void delete(@PathVariable long forumId, Principal auth) {
     forumService.removeForum(forumId, auth.getName());
   }
+
+
+@PostMapping(value = "api/forums/{forumId}/student/answers")
+public AnswerResponse insertAnswer(
+  @PathVariable long forumId,
+  @RequestBody AnswerRequest answerData,
+  Principal auth
+){
+
+  AnswerResponse answerCreated = answerService.insertAnswer(forumId, answerData, auth.getName());
+
+  return answerCreated;
+}
+
+
+
+@GetMapping(value = "api/forums/{forumId}/answers")
+public List<AnswerResponse> getAnswer(
+  @PathVariable long forumId,
+  Principal auth
+){
+  List<AnswerResponse> answerResponse = answerService.getAnswer(forumId, auth.getName());
+
+  return answerResponse;
+
+
+}
+
 }

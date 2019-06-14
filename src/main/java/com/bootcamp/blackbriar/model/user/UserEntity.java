@@ -1,5 +1,6 @@
 package com.bootcamp.blackbriar.model.user;
 
+import com.bootcamp.blackbriar.model.feedback.FeedbackEntity;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.inbox.InboxEntity;
 import com.bootcamp.blackbriar.model.membership.MembershipEntity;
@@ -30,6 +31,9 @@ public class UserEntity implements Serializable {
    */
   @OneToMany(mappedBy = "student")
   private List<MembershipEntity> studyGroups = new ArrayList<MembershipEntity>();
+
+  @OneToMany(mappedBy = "owner")
+  private List<FeedbackEntity> feedbacks = new ArrayList<FeedbackEntity>();
 
   @OneToOne(
     fetch = FetchType.LAZY,
@@ -166,5 +170,13 @@ public class UserEntity implements Serializable {
 
   public void setInbox(InboxEntity inbox) {
     this.inbox = inbox;
+  }
+
+  public List<FeedbackEntity> getFeedbacks() {
+    return feedbacks;
+  }
+
+  public void setFeedbacks(List<FeedbackEntity> feedbacks) {
+    this.feedbacks = feedbacks;
   }
 }

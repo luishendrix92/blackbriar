@@ -1,5 +1,6 @@
 package com.bootcamp.blackbriar.model.forum;
 
+import com.bootcamp.blackbriar.model.answer.AnswerEntity;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import javax.persistence.*;
 import java.io.Serializable;
@@ -38,6 +39,13 @@ public class ForumEntity implements Serializable {
   @UpdateTimestamp
   @Temporal(TemporalType.TIMESTAMP)
   private Date updated;
+
+  /** 
+   * One tu Many Reationship: [Forum]<<-[Answer]
+   * 
+   * **/
+  @OneToMany(mappedBy = "forum")
+  private List<AnswerEntity> answers = new ArrayList<AnswerEntity>();
 
   /**
    * Many to One Relationship: [Forum]<<-[Group]
@@ -151,4 +159,13 @@ public class ForumEntity implements Serializable {
   public void setRoles(List<FMembershipEntity> roles) {
     this.roles = roles;
   }
+
+  public List<AnswerEntity> getAnswers() {
+    return answers;
+  }
+
+  public void setAnswers(List<AnswerEntity> answers) {
+    this.answers = answers;
+  }
+
 }

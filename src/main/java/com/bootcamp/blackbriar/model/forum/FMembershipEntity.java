@@ -1,13 +1,19 @@
 package com.bootcamp.blackbriar.model.forum;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.*;
 
+import com.amazonaws.services.guardduty.model.Feedback;
+import com.bootcamp.blackbriar.model.answer.AnswerEntity;
+import com.bootcamp.blackbriar.model.feedback.FeedbackEntity;
 import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 @Entity(name = "ForumMembership")
 @Table(name = "membershipf")
@@ -34,6 +40,20 @@ public class FMembershipEntity implements Serializable {
   @JoinColumn(name = "fk_forum")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private ForumEntity forum;
+
+  @OneToOne(
+    fetch = FetchType.LAZY,
+    mappedBy = "student",
+    cascade = CascadeType.ALL
+  )
+  private AnswerEntity answer;
+
+  @OneToMany(
+    mappedBy = "student",
+      fetch = FetchType.LAZY
+  )
+  private List<FeedbackEntity> feedbacks = new ArrayList<FeedbackEntity>();
+
 
   @Column(nullable = false)
   private boolean warrior = false;
@@ -102,4 +122,21 @@ public class FMembershipEntity implements Serializable {
   public void setWarrior(boolean warrior) {
     this.warrior = warrior;
   }
+
+  public AnswerEntity getAnswer() {
+    return answer;
+  }
+
+  public void setAnswer(AnswerEntity answer) {
+    this.answer = answer;
+  }
+
+  public List<FeedbackEntity> getFeedbacks() {
+    return feedbacks;
+  }
+
+  public void setFeedbacks(List<FeedbackEntity> feedbacks) {
+    this.feedbacks = feedbacks;
+  }
+
  }
