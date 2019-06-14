@@ -13,12 +13,15 @@ import com.bootcamp.blackbriar.model.answer.AnswerResponse;
 import com.bootcamp.blackbriar.model.feedback.FeedbackResponse;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumResponse;
+import com.bootcamp.blackbriar.model.forum.ForumRest;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -33,14 +36,28 @@ public class ForumController{
   AnswerService answerService;
 
   @GetMapping(value = "/api/forums/{forumId}")
-  public ForumResponse getForumDetails(@PathVariable long forumId) {
-    return modelMapper.map(forumService.fetchForum(forumId), ForumResponse.class);
+  public ForumResponse getForumDetails(
+    @RequestParam(required = false) Boolean scoreboard,
+    @PathVariable long forumId,
+    Principal auth
+  ) {
+    ForumEntity forum = forumService.fetchForum(forumId);
+    ForumResponse response = modelMapper.map(forum, ForumResponse.class);
+    boolean userIsStudent = !forum.getGroup().getOwner().getUserId().equals(auth.getName());
+    boolean forumHasNotEnded = forum.getSettings().getEndDate().getTime() > new Date().getTime();
+    boolean hideScoreboard = scoreboard != null && !scoreboard;
+
+    if (userIsStudent && forumHasNotEnded || hideScoreboard) {
+      response.setScoreboard(new ArrayList<>());
+    }
+
+    return response;
   }
 
   @GetMapping(value = "/api/groups/{groupId}/forums")
-  public List<ForumResponse> listGroupForums(@PathVariable long groupId, Principal auth) {
+  public List<ForumRest> listGroupForums(@PathVariable long groupId, Principal auth) {
     List<ForumEntity> groupForums = forumService.getForumsByGroup(groupId, auth.getName());
-    Type forumList = new TypeToken<List<ForumResponse>>(){}.getType();
+    Type forumList = new TypeToken<List<ForumRest>>(){}.getType();
     
     return modelMapper.map(groupForums, forumList);
   }
@@ -63,7 +80,6 @@ public class ForumController{
   @PutMapping(value = "/api/forums/{forumId}/publish")
   public ForumResponse startActivity(@PathVariable long forumId, Principal auth) {
     ForumEntity startedForum = forumService.publishForum(forumId, auth.getName());
-    startedForum = forumService.fetchForum(forumId);
 
     return modelMapper.map(startedForum, ForumResponse.class);
   }

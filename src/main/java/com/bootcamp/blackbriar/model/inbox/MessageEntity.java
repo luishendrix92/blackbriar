@@ -17,6 +17,7 @@ public class MessageEntity implements Serializable {
   private long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
+  // TODO: Cascade
   @JoinColumn(name = "fk_inbox")
   private InboxEntity inbox;
 

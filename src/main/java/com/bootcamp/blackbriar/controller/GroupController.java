@@ -4,6 +4,7 @@ import com.bootcamp.blackbriar.service.group.GroupService;
 import com.bootcamp.blackbriar.service.user.UserService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.group.GroupResponse;
+import com.bootcamp.blackbriar.model.group.InstructorGroupResponse;
 import com.bootcamp.blackbriar.model.group.StudentGroupResponse;
 import com.bootcamp.blackbriar.model.user.GroupMemberResponse;
 
@@ -52,6 +53,16 @@ public class GroupController {
     GroupEntity group = groupService.getGroup(groupId);
 
     return modelMapper.map(group, GroupResponse.class);
+  }
+
+  @PostMapping
+  public InstructorGroupResponse createGroup(
+    @RequestBody GroupEntity groupData,
+    Principal auth
+  ) {
+    GroupEntity createdGroup = groupService.createGroup(auth.getName(), groupData);
+
+    return modelMapper.map(createdGroup, InstructorGroupResponse.class);
   }
 
   @PutMapping

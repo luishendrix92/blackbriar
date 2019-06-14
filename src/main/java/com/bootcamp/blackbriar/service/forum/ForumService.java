@@ -8,6 +8,7 @@ import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.repository.ForumRepository;
 import com.bootcamp.blackbriar.repository.ForumSettingsRepository;
 import com.bootcamp.blackbriar.repository.GroupRepository;
+import com.bootcamp.blackbriar.service.inbox.InboxService;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class ForumService {
   private ForumRoleService roleService;
 
   @Autowired
+  private InboxService inboxService;
+
+  @Autowired
   private GroupRepository groupRepository;
 
   @Autowired
@@ -37,15 +41,19 @@ public class ForumService {
 
   public ForumEntity fetchForum(long forumId) {
     return forumRepository.findById(forumId)
-        .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
+      .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
   }
 
   public ForumEntity createForum(long groupId, ForumRequest forumDetails, String instructorId) {
     GroupEntity group = groupRepository.findById(groupId)
-        .orElseThrow(() -> new EntityNotFoundException("This group does not exist."));
-
+      .orElseThrow(() -> new EntityNotFoundException("This group does not exist."));
+    
     if (!group.getOwner().getUserId().equals(instructorId)) {
       throw new RuntimeException("Only group owners can add forum activities to them.");
+    } else if (forumDetails.getEndDate().getTime() <= new Date().getTime()) {
+      throw new RuntimeException("End date should take place in the future.");
+    } else if (forumDetails.isPublished() && group.getMembers().size() == 0) {
+      throw new RuntimeException("Your group has no members yet.");
     }
 
     ForumEntity forum = modelMapper.map(forumDetails, ForumEntity.class);
@@ -57,16 +65,13 @@ public class ForumService {
     settings = modelMapper.map(forumDetails, ForumSettingsEntity.class);
 
     settings.setForum(forum);
-    settingsRepository.save(settings);
     
-
     if (forum.isPublished()) {
-      settings.setStartDate(new Date());
-      settings =  settingsRepository.save(settings);
-      List<FMembershipEntity> forumGroupMembers = roleService.createMembershipForum(forum);
-      forum.setRoles(forumGroupMembers);
+      forum.setScoreboard(init(forum));
     }
 
+    settings.setStartDate(new Date());
+    settingsRepository.save(settings);
     forum.setSettings(settings);
 
     return forum;
@@ -99,6 +104,7 @@ public class ForumService {
       .orElseThrow(() -> new EntityNotFoundException("Forum not found."));
     ForumSettingsEntity settings = forum.getSettings();
     
+    // TODO: Test if else/if works instead of separate ifs
     if (forum.isPublished()) {
       throw new RuntimeException("This forum has already started.");
     }
@@ -115,11 +121,26 @@ public class ForumService {
       throw new RuntimeException("The group has no members yet.");
     }
 
-    roleService.createMembershipForum(forum);
+    init(forum);
     forum.setPublished(true);
     settings.setStartDate(new Date());
     settingsRepository.save(settings);
 
     return forumRepository.save(forum);
+  }
+
+  private List<FMembershipEntity> init(ForumEntity forum) {
+    List<FMembershipEntity> members = roleService.initMembership(forum);
+
+    for (FMembershipEntity member : members) {
+      inboxService.sendMessage(
+        member.getMember().getStudent().getUserId(),
+        forum.getId(),
+        "A forum activity '" + forum.getTitle() + "' started in group '" + forum.getGroup().getTitle() + ".'",
+        "FMSTR"
+      );
+    }
+
+    return members;
   }
 }

@@ -59,15 +59,6 @@ public class UserController {
     return groups;
   }
 
-  @PostMapping(value = "/{instructorUserId}/groups/owned")
-  public InstructorGroupResponse createGroup(
-    @PathVariable String instructorUserId,
-    @RequestBody GroupEntity groupData) {
-    GroupEntity createdGroup = groupService.createGroup(instructorUserId, groupData);
-
-    return modelMapper.map(createdGroup, InstructorGroupResponse.class);
-  }
-
   @PostMapping
   public UserProfile createUser(@RequestBody UserDetailsRequestModel userDetails) {
     UserProfile returnValue = new UserProfile();

@@ -1,6 +1,12 @@
 package com.bootcamp.blackbriar.model.forum;
 
+import com.bootcamp.blackbriar.model.membership.MembershipEntity;
+
 public class ScoreRoleDetails {
+  private long groupMembershipId;
+  private String firstName;
+  private String lastName;
+  private String photo;
   private boolean warrior;
   private boolean healer;
   private boolean warlock;
@@ -36,5 +42,28 @@ public class ScoreRoleDetails {
 
   public void setScore(int score) {
     this.score = score;
+  }
+
+  public long getGroupMembershipId() {
+    return groupMembershipId;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public String getPhoto() {
+    return photo;
+  }
+
+  public void setMember(MembershipEntity forumGroupMember) {
+    this.groupMembershipId = forumGroupMember.getId();
+    this.firstName = forumGroupMember.getStudent().getFirstName();
+    this.lastName = forumGroupMember.getStudent().getLastName();
+    this.photo = forumGroupMember.getStudent().getPhoto();
   }
 }
