@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Type;
 
 @Entity(name = "Forum")
 public class ForumEntity implements Serializable {
@@ -26,6 +27,8 @@ public class ForumEntity implements Serializable {
   private String description;
 
   @Column(nullable = false)
+  @Lob
+  @Type(type = "text")
   private String content;
 
   @Column(nullable = false)
