@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.security.Principal;
 
 import com.bootcamp.blackbriar.model.answer.AnswerEntity;
+import com.bootcamp.blackbriar.model.answer.AnswerInstructorRequest;
 import com.bootcamp.blackbriar.model.answer.AnswerRequest;
 import com.bootcamp.blackbriar.model.answer.AnswerResponse;
 import com.bootcamp.blackbriar.model.feedback.FeedbackResponse;
@@ -86,6 +87,18 @@ public AnswerResponse insertAnswer(
   return answerCreated;
 }
 
+@PutMapping(value = "api/forums/{forumId}/answers/validate")
+public AnswerResponse validateAnswer(
+  @PathVariable long forumId,
+  @RequestBody AnswerInstructorRequest answerData,
+  Principal auth
+){
+    AnswerEntity answerUpdated = answerService.validateAnswer(answerData, auth.getName(), forumId);
+    AnswerResponse returnValue = modelMapper.map(answerUpdated,AnswerResponse.class);
+
+    return returnValue;
+}
+
 
 
 @GetMapping(value = "api/forums/{forumId}/answers")
@@ -99,5 +112,7 @@ public List<AnswerResponse> getAnswer(
 
 
 }
+
+
 
 }

@@ -2,6 +2,7 @@ package com.bootcamp.blackbriar.service.answer;
 
 import com.amazonaws.services.apigateway.model.Model;
 import com.bootcamp.blackbriar.model.answer.AnswerEntity;
+import com.bootcamp.blackbriar.model.answer.AnswerInstructorRequest;
 import com.bootcamp.blackbriar.model.answer.AnswerRequest;
 import com.bootcamp.blackbriar.model.answer.AnswerResponse;
 import com.bootcamp.blackbriar.model.feedback.FeedbackEntity;
@@ -13,6 +14,7 @@ import com.bootcamp.blackbriar.model.user.UserRest;
 import com.bootcamp.blackbriar.repository.AnswerRepository;
 import com.bootcamp.blackbriar.repository.FMembershipRepository;
 import com.bootcamp.blackbriar.repository.ForumRepository;
+import com.bootcamp.blackbriar.repository.UserRepository;
 
 import java.lang.reflect.Type;
 import org.modelmapper.ModelMapper;
@@ -43,6 +45,31 @@ public class AnswerService {
   @Autowired
   private ModelMapper modelMapper;
 
+  @Autowired
+  private UserRepository userRepository;
+
+
+  public AnswerEntity validateAnswer(AnswerInstructorRequest answerDetails, String userId, long forumId){
+    
+
+    AnswerEntity answerUpdated = answerRepository.findById(answerDetails.getAnswerId())
+    .orElseThrow(() -> new EntityNotFoundException("This answer does not exist."));
+
+    if((answerUpdated.getForum().getGroup().getOwner().getUserId()).equals(userId)){
+      answerUpdated.setValidate(answerDetails.getAprove());
+      answerUpdated.setCreated(new Date());
+      answerUpdated = answerRepository.save(answerUpdated);
+
+    }
+
+    else{
+      throw new EntityNotFoundException("You are not authorized to perform this action.");
+    }
+
+    return answerUpdated;
+    
+  }
+
   public AnswerResponse insertAnswer(long forumId, AnswerRequest answerData, String userId) {
     String message = "";
     int count = 0;
@@ -68,6 +95,7 @@ public class AnswerService {
         count++;
         message = "Your answer has been updated, wait for the teacher to rate your answer.";
         answerCreated.setCounter(count);
+        answerCreated.setValidate(null);
       }
     }
 
