@@ -42,14 +42,17 @@ public class GroupEntity implements Serializable {
   @OneToMany(mappedBy = "group")
   private List<MembershipEntity> members = new ArrayList<MembershipEntity>();
 
-  @Column(length = 100, nullable = false)
+  @Column(nullable = false)
   private String title;
 
+  @Lob
+  @Column(nullable = false)
   private String description;
 
-  @Column(length = 100, nullable = false)
+  @Column(nullable = false)
   private String image = "blank.jpg";
 
+  @Column(nullable = true)
   private boolean publicGroup = true;
 
   public long getId() {

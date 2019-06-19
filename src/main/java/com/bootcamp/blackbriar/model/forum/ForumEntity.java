@@ -78,7 +78,8 @@ public class ForumEntity implements Serializable {
    * kept in an entity called ForumMembership.
    */
   @OneToMany(mappedBy = "forum")
-  private List<FMembershipEntity> roles = new ArrayList<FMembershipEntity>();
+  // @OrderBy(value = "score")
+  private List<FMembershipEntity> scoreboard = new ArrayList<FMembershipEntity>();
 
   public long getId() {
     return id;
@@ -152,12 +153,12 @@ public class ForumEntity implements Serializable {
     this.published = published;
   }
 
-  public List<FMembershipEntity> getRoles() {
-    return roles;
+  public List<FMembershipEntity> getScoreboard() {
+    return scoreboard;
   }
 
-  public void setRoles(List<FMembershipEntity> roles) {
-    this.roles = roles;
+  public void setScoreboard(List<FMembershipEntity> scoreboard) {
+    this.scoreboard = scoreboard;
   }
 
   public List<AnswerEntity> getAnswers() {
