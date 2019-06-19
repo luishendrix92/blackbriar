@@ -1,9 +1,13 @@
 package com.bootcamp.blackbriar.model.forum;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.*;
 
+import com.bootcamp.blackbriar.model.comments.AnswerEntity;
+import com.bootcamp.blackbriar.model.comments.FeedbackEntity;
 import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 
 import org.hibernate.annotations.OnDelete;
@@ -34,6 +38,16 @@ public class FMembershipEntity implements Serializable {
   @JoinColumn(name = "fk_forum")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private ForumEntity forum;
+
+  @OneToOne(
+    fetch = FetchType.LAZY,
+    mappedBy = "student",
+    cascade = CascadeType.ALL
+  )
+  private AnswerEntity answer;
+
+  @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+  private List<FeedbackEntity> feedback = new ArrayList<FeedbackEntity>();
 
   @Column(nullable = false)
   private boolean warrior = false;
@@ -101,5 +115,21 @@ public class FMembershipEntity implements Serializable {
 
   public void setWarrior(boolean warrior) {
     this.warrior = warrior;
+  }
+
+  public AnswerEntity getAnswer() {
+    return answer;
+  }
+
+  public void setAnswer(AnswerEntity answer) {
+    this.answer = answer;
+  }
+
+  public List<FeedbackEntity> getFeedback() {
+    return feedback;
+  }
+
+  public void setFeedback(List<FeedbackEntity> feedback) {
+    this.feedback = feedback;
   }
  }

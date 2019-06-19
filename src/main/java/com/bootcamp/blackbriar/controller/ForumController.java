@@ -1,11 +1,14 @@
 package com.bootcamp.blackbriar.controller;
 
 import com.bootcamp.blackbriar.model.forum.ForumRequest;
+import com.bootcamp.blackbriar.service.forum.AnswerService;
 import com.bootcamp.blackbriar.service.forum.ForumService;
 
 import java.lang.reflect.Type;
 import java.security.Principal;
 
+import com.bootcamp.blackbriar.model.comments.AnswerRequest;
+import com.bootcamp.blackbriar.model.comments.AnswerResponse;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumResponse;
 import com.bootcamp.blackbriar.model.forum.ForumRest;
@@ -27,12 +30,12 @@ public class ForumController {
   @Autowired
   ModelMapper modelMapper;
 
+  @Autowired
+  private AnswerService answerService;
+
   @GetMapping(value = "/api/forums/{forumId}")
-  public ForumResponse getForumDetails(
-    @RequestParam(required = false) Boolean scoreboard,
-    @PathVariable long forumId,
-    Principal auth
-  ) {
+  public ForumResponse getForumDetails(@RequestParam(required = false) Boolean scoreboard, @PathVariable long forumId,
+      Principal auth) {
     ForumEntity forum = forumService.fetchForum(forumId);
     ForumResponse response = modelMapper.map(forum, ForumResponse.class);
     boolean userIsStudent = !forum.getGroup().getOwner().getUserId().equals(auth.getName());
@@ -49,17 +52,14 @@ public class ForumController {
   @GetMapping(value = "/api/groups/{groupId}/forums")
   public List<ForumRest> listGroupForums(@PathVariable long groupId, Principal auth) {
     List<ForumEntity> groupForums = forumService.getForumsByGroup(groupId, auth.getName());
-    Type forumList = new TypeToken<List<ForumRest>>(){}.getType();
-    
+    Type forumList = new TypeToken<List<ForumRest>>() {
+    }.getType();
+
     return modelMapper.map(groupForums, forumList);
   }
 
   @PostMapping(value = "/api/groups/{groupId}/forums")
-  public ForumResponse createForum(
-    @PathVariable long groupId,
-    @RequestBody ForumRequest forumDetails,
-    Principal auth
-  ) {
+  public ForumResponse createForum(@PathVariable long groupId, @RequestBody ForumRequest forumDetails, Principal auth) {
     ForumEntity forum = forumService.createForum(groupId, forumDetails, auth.getName());
 
     return modelMapper.map(forum, ForumResponse.class);
@@ -75,5 +75,19 @@ public class ForumController {
   @DeleteMapping(value = "/api/forums/{forumId}")
   public void delete(@PathVariable long forumId, Principal auth) {
     forumService.removeForum(forumId, auth.getName());
+  }
+
+  @GetMapping(value = "api/forums/{forumId}/answers")
+  public List<AnswerResponse> getForumComments(@PathVariable long forumId, Principal auth) {
+    return answerService.getAnswers(forumId, auth.getName());
+  }
+
+  @PostMapping(value = "api/forums/{forumId}/answers")
+  public AnswerResponse answerForum(
+    @PathVariable long forumId,
+    @RequestBody AnswerRequest answerData,
+    Principal auth
+  ) {
+    return answerService.insertAnswer(forumId, answerData, auth.getName());
   }
 }

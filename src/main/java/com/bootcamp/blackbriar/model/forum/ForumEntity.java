@@ -1,5 +1,6 @@
 package com.bootcamp.blackbriar.model.forum;
 
+import com.bootcamp.blackbriar.model.comments.AnswerEntity;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity(name = "Forum")
@@ -26,6 +28,8 @@ public class ForumEntity implements Serializable {
   private String description;
 
   @Column(nullable = false)
+  @Lob
+  @Type(type = "text")
   private String content;
 
   @Column(nullable = false)
@@ -72,6 +76,15 @@ public class ForumEntity implements Serializable {
   @OneToMany(mappedBy = "forum")
   // @OrderBy(value = "score")
   private List<FMembershipEntity> scoreboard = new ArrayList<FMembershipEntity>();
+
+  /** 
+   * One to Many Relationship: [Forum]->>[Answer]
+   * ============================================
+   * A forum may have answers (comments) made by
+   * students with or without replies.
+   */
+  @OneToMany(mappedBy = "forum")
+  private List<AnswerEntity> answers = new ArrayList<AnswerEntity>();
 
   public long getId() {
     return id;
@@ -151,5 +164,13 @@ public class ForumEntity implements Serializable {
 
   public void setScoreboard(List<FMembershipEntity> scoreboard) {
     this.scoreboard = scoreboard;
+  }
+
+  public List<AnswerEntity> getAnswers() {
+    return answers;
+  }
+
+  public void setAnswers(List<AnswerEntity> answers) {
+    this.answers = answers;
   }
 }
