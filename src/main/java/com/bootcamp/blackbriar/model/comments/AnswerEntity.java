@@ -41,7 +41,7 @@ public class AnswerEntity implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date updated;
 
-  @OneToMany(mappedBy = "parent")
+  @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
   private List<FeedbackEntity> replies = new ArrayList<FeedbackEntity>();
 
   @ManyToOne(fetch = FetchType.LAZY)
