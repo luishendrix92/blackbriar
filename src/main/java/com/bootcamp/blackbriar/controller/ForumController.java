@@ -7,6 +7,7 @@ import com.bootcamp.blackbriar.service.forum.ForumService;
 import java.lang.reflect.Type;
 import java.security.Principal;
 
+import com.bootcamp.blackbriar.model.comments.AnswerEntity;
 import com.bootcamp.blackbriar.model.comments.AnswerRequest;
 import com.bootcamp.blackbriar.model.comments.AnswerResponse;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
@@ -89,5 +90,21 @@ public class ForumController {
     Principal auth
   ) {
     return answerService.insertAnswer(forumId, answerData, auth.getName());
+  }
+
+  @PutMapping(value = "api/answers/{answerId}/review")
+  public AnswerResponse reviewAnswer(
+    @PathVariable long answerId,
+    @RequestParam(defaultValue = "true") boolean approve,
+    Principal auth
+  ) {
+    AnswerEntity reviewed = answerService.reviewAnswer(answerId, approve, auth.getName());
+
+    return modelMapper.map(reviewed, AnswerResponse.class);
+  }
+
+  @DeleteMapping(value = "api/answers/{answerId}")
+  public void removeAnswer(@PathVariable long answerId) {
+    answerService.deleteAnswer(answerId);
   }
 }

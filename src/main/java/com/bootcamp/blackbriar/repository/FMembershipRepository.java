@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FMembershipRepository extends CrudRepository<FMembershipEntity, Long> {
   Optional<FMembershipEntity> findByMemberStudentUserId(String userId);
-  FMembershipEntity findByMemberStudentUserIdAndForumId(String userId, long forumId);
+  Optional<FMembershipEntity> findByMemberStudentUserIdAndForumId(String userId, long forumId);
 }
