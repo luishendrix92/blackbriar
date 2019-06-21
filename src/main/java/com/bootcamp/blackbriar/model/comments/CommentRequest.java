@@ -1,6 +1,6 @@
 package com.bootcamp.blackbriar.model.comments;
 
-public class AnswerRequest {
+public class CommentRequest {
   private String content;
 
   public String getContent() {

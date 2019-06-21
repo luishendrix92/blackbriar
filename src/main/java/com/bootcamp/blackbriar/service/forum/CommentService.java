@@ -5,6 +5,7 @@ import com.bootcamp.blackbriar.model.forum.FMembershipEntity;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.repository.AnswerRepository;
 import com.bootcamp.blackbriar.repository.FMembershipRepository;
+import com.bootcamp.blackbriar.repository.FeedbackRepository;
 import com.bootcamp.blackbriar.repository.ForumRepository;
 
 import java.lang.reflect.Type;
@@ -19,12 +20,15 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 
 @Service
-public class AnswerService {
+public class CommentService {
   @Autowired
   private FMembershipRepository fmembershipRepository;
 
   @Autowired
   private AnswerRepository answerRepository;
+
+  @Autowired
+  private FeedbackRepository feedbackRepository;
 
   @Autowired
   private ForumRepository forumRepository;
@@ -33,7 +37,7 @@ public class AnswerService {
   private ModelMapper modelMapper;
 
   // TODO: Separate by update and insert
-  public AnswerResponse insertAnswer(long forumId, AnswerRequest answerData, String userId) {
+  public AnswerResponse insertAnswer(long forumId, CommentRequest answerData, String userId) {
     String message;
 
     ForumEntity forum = forumRepository.findById(forumId)
@@ -127,7 +131,58 @@ public class AnswerService {
     return answerRepository.save(toReview);
   }
 
-  public void deleteAnswer(long answerId) {
-    answerRepository.deleteById(answerId);
+  public FeedbackEntity createFeedback(CommentRequest data, long answerId, String userId) {
+    AnswerEntity answer = answerRepository.findById(answerId)
+      .orElseThrow(() -> new EntityNotFoundException("Answer not found."));
+    FMembershipEntity member = fmembershipRepository
+      .findByMemberStudentUserIdAndForumId(userId, answer.getForum().getId())
+      .orElse(null);
+    FeedbackEntity feedback = new FeedbackEntity();
+    
+    if (member != null) {
+      answerRepository.findByStudentMemberStudentUserIdAndApproved(userId, Boolean.TRUE)
+        .orElseThrow(() -> new RuntimeException("You must have your answer approved."));
+
+      feedback.setStudent(member);
+    } else if (answer.getForum().getGroup().getOwner().getUserId().equals(userId)) {
+      feedback.setInstructor(answer.getForum().getGroup().getOwner());
+    } else {
+      throw new RuntimeException("Only forum owners and members can reply to answers.");
+    }
+
+    feedback.setContent(data.getContent());
+    feedback.setParent(answer);
+
+    return feedbackRepository.save(feedback);
+  }
+
+  public FeedbackEntity reviewFeedback(long feedbackId, boolean approve, String userId) {
+    FeedbackEntity feedback = feedbackRepository.findById(feedbackId)
+      .orElseThrow(() -> new EntityNotFoundException("Feedback not found."));
+    boolean isForumOwner = feedback.getParent()
+      .getForum().getGroup().getOwner().getUserId().equals(userId);
+    
+    if (!isForumOwner) {
+      throw new RuntimeException("Only the forum owner can review this feedback.");
+    } else if (feedback.getInstructor() != null) {
+      throw new RuntimeException("Instructors can't review their own feedback.");
+    } else if (feedback.isApproved() == approve) {
+      throw new RuntimeException("You already approved or rejected this feedback.");
+    }
+
+    feedback.setApproved(approve);
+
+    return feedbackRepository.save(feedback);
+  }
+
+  public void deleteFeedback(long feedbackId, String userId) {
+    FeedbackEntity feedback = feedbackRepository.findById(feedbackId)
+      .orElseThrow(() -> new EntityNotFoundException("Feedback not found."));
+
+    if (!feedback.getParent().getForum().getGroup().getOwner().getUserId().equals(userId)) {
+      throw new RuntimeException("Only the forum owner can delete feedback.");
+    }
+
+    feedbackRepository.deleteById(feedbackId);
   }
 }
