@@ -1,15 +1,11 @@
 package com.bootcamp.blackbriar.controller;
 
-import com.bootcamp.blackbriar.model.forum.ForumRequest;
-import com.bootcamp.blackbriar.service.forum.AnswerService;
 import com.bootcamp.blackbriar.service.forum.ForumService;
 
 import java.lang.reflect.Type;
 import java.security.Principal;
 
-import com.bootcamp.blackbriar.model.comments.AnswerEntity;
-import com.bootcamp.blackbriar.model.comments.AnswerRequest;
-import com.bootcamp.blackbriar.model.comments.AnswerResponse;
+import com.bootcamp.blackbriar.model.forum.ForumRequest;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumResponse;
 import com.bootcamp.blackbriar.model.forum.ForumRest;
@@ -30,9 +26,6 @@ public class ForumController {
 
   @Autowired
   ModelMapper modelMapper;
-
-  @Autowired
-  private AnswerService answerService;
 
   @GetMapping(value = "/api/forums/{forumId}")
   public ForumResponse getForumDetails(@RequestParam(required = false) Boolean scoreboard, @PathVariable long forumId,
@@ -76,35 +69,5 @@ public class ForumController {
   @DeleteMapping(value = "/api/forums/{forumId}")
   public void delete(@PathVariable long forumId, Principal auth) {
     forumService.removeForum(forumId, auth.getName());
-  }
-
-  @GetMapping(value = "api/forums/{forumId}/answers")
-  public List<AnswerResponse> getForumComments(@PathVariable long forumId, Principal auth) {
-    return answerService.getAnswers(forumId, auth.getName());
-  }
-
-  @PostMapping(value = "api/forums/{forumId}/answers")
-  public AnswerResponse answerForum(
-    @PathVariable long forumId,
-    @RequestBody AnswerRequest answerData,
-    Principal auth
-  ) {
-    return answerService.insertAnswer(forumId, answerData, auth.getName());
-  }
-
-  @PutMapping(value = "api/answers/{answerId}/review")
-  public AnswerResponse reviewAnswer(
-    @PathVariable long answerId,
-    @RequestParam(defaultValue = "true") boolean approve,
-    Principal auth
-  ) {
-    AnswerEntity reviewed = answerService.reviewAnswer(answerId, approve, auth.getName());
-
-    return modelMapper.map(reviewed, AnswerResponse.class);
-  }
-
-  @DeleteMapping(value = "api/answers/{answerId}")
-  public void removeAnswer(@PathVariable long answerId) {
-    answerService.deleteAnswer(answerId);
   }
 }
