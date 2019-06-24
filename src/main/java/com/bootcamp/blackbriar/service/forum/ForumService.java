@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -65,14 +68,13 @@ public class ForumService {
     settings = modelMapper.map(forumDetails, ForumSettingsEntity.class);
 
     settings.setForum(forum);
-    
-    if (forum.isPublished()) {
-      forum.setScoreboard(init(forum));
-    }
-
     settings.setStartDate(new Date());
     settingsRepository.save(settings);
     forum.setSettings(settings);
+
+    if (forum.isPublished()) {
+      forum.setScoreboard(init(forum));
+    }
 
     return forum;
   }
@@ -131,6 +133,10 @@ public class ForumService {
 
   private List<FMembershipEntity> init(ForumEntity forum) {
     List<FMembershipEntity> members = roleService.initMembership(forum);
+    ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+    long warlockAlertDelay = forum.getSettings().getEndDate().getTime() -
+      TimeUnit.HOURS.toMillis(24) -
+      new Date().getTime();
 
     for (FMembershipEntity member : members) {
       inboxService.sendMessage(
@@ -140,6 +146,19 @@ public class ForumService {
         "FMSTR"
       );
     }
+
+    ses.schedule(() -> {
+      System.out.println("Mensajes enviados alv");
+      for (FMembershipEntity member : members) {
+        inboxService.sendMessage(
+          member.getMember().getStudent().getUserId(),
+          forum.getId(),
+          member.getForum().getTitle(),
+          "FMWLK"
+        );
+      }
+    }, warlockAlertDelay, TimeUnit.MILLISECONDS);
+    ses.shutdown();
 
     return members;
   }
