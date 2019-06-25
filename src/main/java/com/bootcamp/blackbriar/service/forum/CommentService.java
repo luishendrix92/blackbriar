@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -36,74 +38,62 @@ public class CommentService {
   @Autowired
   private ModelMapper modelMapper;
 
-  // TODO: Separate by update and insert
   public AnswerResponse insertAnswer(long forumId, CommentRequest answerData, String userId) {
-    String message;
-
     ForumEntity forum = forumRepository.findById(forumId)
       .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
+    FMembershipEntity student = fmembershipRepository.findByMemberStudentUserIdAndForumId(userId, forumId)
+      .orElse(null);
 
-    if (
-      fmembershipRepository
-        .findByMemberStudentUserIdAndForumId(userId, forumId)
-        .orElse(null) == null ||
-      forum.getGroup().getOwner().getUserId().equals(userId)
-    ) {
+    if (student == null || forum.getGroup().getOwner().getUserId().equals(userId)) {
       throw new EntityNotFoundException("Instructors and non-members can't answer forums.");
     }
 
-    AnswerEntity answerCreated = modelMapper.map(answerData, AnswerEntity.class);
-    AnswerEntity answerObtained = answerRepository.findByStudentMemberStudentUserId(userId);
+    answerRepository.findByStudentId(student.getId()).ifPresent(
+      (_answer) -> { throw new RuntimeException("You already answered this forum."); }
+    );
 
-    if (answerObtained != null) {
-      if (answerObtained.getApproved()) {
-        throw new RuntimeException("You have already responded to this forum, and your answer has already been accepted.");
-      } else {
-        message = "Your answer has been updated, wait for the teacher to rate your answer.";
+    AnswerEntity created = new AnswerEntity();
 
-        answerCreated.setAttempts(
-          answerCreated.getAttempts() + 1
-        );
-      }
-    } else {
-      message = "Your answer has been successfully saved.";
-    }
+    created.setForum(forum);
+    created.setStudent(student);
+    created.setContent(answerData.getContent());
 
-    FMembershipEntity student = fmembershipRepository
-      .findByMemberStudentUserIdAndForumId(userId, forumId)
-      .orElseThrow(() -> new EntityNotFoundException("User is not subscribed to this forum."));
-
-    answerCreated.setForum(forum);
-    answerCreated.setStudent(student);
-
-    answerCreated = answerRepository.save(answerCreated);
-    AnswerResponse answerResponse = modelMapper.map(answerCreated, AnswerResponse.class);
-
-    answerResponse.setMessage(message);
-
-    return answerResponse;
+    created = answerRepository.save(created);
+    
+    return modelMapper.map(created, AnswerResponse.class);
   }
 
   public List<AnswerResponse> getAnswers(long forumId, String userId) {
-
     ForumEntity forum = forumRepository.findById(forumId)
       .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
     boolean isInstructor = forum.getGroup().getOwner().getUserId().equals(userId);
+    FMembershipEntity student = fmembershipRepository.findByMemberStudentUserIdAndForumId(userId, forumId)
+      .orElse(null);
 
-    if (
-      !isInstructor &&
-      fmembershipRepository
-        .findByMemberStudentUserIdAndForumId(userId, forumId)
-        .orElse(null) == null
-    ) {
+    if (!isInstructor && student == null) {
       throw new RuntimeException("Only instructors and members can view forum comments.");
     }
 
-    List<AnswerEntity> answers = answerRepository
-      .findByStudentMemberStudentUserIdAndForumId(userId, forumId);
+    List<AnswerEntity> answers = new ArrayList<AnswerEntity>();
 
-    if (isInstructor || (answers.size() > 0 && answers.get(0).getApproved() == Boolean.TRUE)) {
+    if (isInstructor) {
       answers = forum.getAnswers();
+    } else {
+      AnswerEntity existingAnswer = answerRepository.findByStudentId(student.getId()).orElse(null);
+
+      if (existingAnswer != null && existingAnswer.getApproved() == Boolean.TRUE) {
+        answers = answerRepository.findByForumIdAndApproved(forumId, true);
+
+        for (AnswerEntity answer : answers) {
+          answer.setReplies(
+            answer.getReplies().stream()
+              .filter(feedback -> feedback.isApproved())
+              .collect(Collectors.toList())
+          );
+        }
+      } else if (existingAnswer != null) {
+        answers.add(existingAnswer);
+      }
     }
 
     Type AnswerRest = new TypeToken<List<AnswerResponse>>() {}.getType();
@@ -140,12 +130,13 @@ public class CommentService {
     FeedbackEntity feedback = new FeedbackEntity();
     
     if (member != null) {
-      answerRepository.findByStudentMemberStudentUserIdAndApproved(userId, Boolean.TRUE)
+      answerRepository.findByStudentIdAndApproved(member.getId(), Boolean.TRUE)
         .orElseThrow(() -> new RuntimeException("You must have your answer approved."));
 
       feedback.setStudent(member);
     } else if (answer.getForum().getGroup().getOwner().getUserId().equals(userId)) {
       feedback.setInstructor(answer.getForum().getGroup().getOwner());
+      feedback.setApproved(true);
     } else {
       throw new RuntimeException("Only forum owners and members can reply to answers.");
     }

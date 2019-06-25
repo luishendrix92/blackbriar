@@ -138,17 +138,7 @@ public class ForumService {
       TimeUnit.HOURS.toMillis(24) -
       new Date().getTime();
 
-    for (FMembershipEntity member : members) {
-      inboxService.sendMessage(
-        member.getMember().getStudent().getUserId(),
-        forum.getId(),
-        "A forum activity '" + forum.getTitle() + "' started in group '" + forum.getGroup().getTitle() + ".'",
-        "FMSTR"
-      );
-    }
-
     ses.schedule(() -> {
-      System.out.println("Mensajes enviados alv");
       for (FMembershipEntity member : members) {
         inboxService.sendMessage(
           member.getMember().getStudent().getUserId(),
@@ -158,7 +148,17 @@ public class ForumService {
         );
       }
     }, warlockAlertDelay, TimeUnit.MILLISECONDS);
+
     ses.shutdown();
+
+    for (FMembershipEntity member : members) {
+      inboxService.sendMessage(
+        member.getMember().getStudent().getUserId(),
+        forum.getId(),
+        "A forum activity '" + forum.getTitle() + "' started in group '" + forum.getGroup().getTitle() + ".'",
+        "FMSTR"
+      );
+    }
 
     return members;
   }
