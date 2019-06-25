@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AnswerRepository extends CrudRepository<AnswerEntity, Long> {
   AnswerEntity findByStudentMemberStudentUserId(String studentId);
-  List<AnswerEntity> findByStudentMemberStudentUserIdAndForumId(String userId, long forumId);
-  Optional<AnswerEntity> findByStudentMemberStudentUserIdAndApproved(String userId, Boolean approved);
+  Optional<AnswerEntity> findByStudentMemberStudentUserIdAndForumId(String userId, long forumId);
+  Optional<AnswerEntity> findByStudentIdAndApproved(long fMembershipId, Boolean approved);
+  Optional<AnswerEntity> findByStudentId(long fMembershipId);
+  List<AnswerEntity> findByForumIdAndApproved(long forumId, boolean approved);
 }

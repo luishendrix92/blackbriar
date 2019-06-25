@@ -15,7 +15,6 @@ public class AnswerResponse {
   private UserRest studentDetails;
   private Date created;
   private Date updated;
-  private String message;
   
   private List<FeedbackResponse> replies = new ArrayList<FeedbackResponse>();
 
@@ -33,14 +32,6 @@ public class AnswerResponse {
 
   public void setId(long id) {
     this.id = id;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
   }
 
   public Date getCreated() {

@@ -4,6 +4,8 @@ import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.model.user.UserEntity;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -45,10 +47,13 @@ public class GroupEntity implements Serializable {
   @Column(length = 100, nullable = false)
   private String title;
 
+  @Lob
+  @Type(type = "text")
+  @Column(nullable = false)
   private String description;
 
   @Column(length = 100, nullable = false)
-  private String image = "blank.jpg";
+  private String image = "https://blackbriarfiles.s3.amazonaws.com/default.png";
 
   private boolean publicGroup = true;
 

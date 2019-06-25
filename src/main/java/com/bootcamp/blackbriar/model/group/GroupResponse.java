@@ -6,7 +6,7 @@ public class GroupResponse {
   private long id;
   private String title;
   private String description;
-  private String image = "blank.jpg";
+  private String image = "https://blackbriarfiles.s3.amazonaws.com/default.png";
   private UserRest owner;
   private boolean publicGroup = true;
 
