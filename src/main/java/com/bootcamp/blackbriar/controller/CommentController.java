@@ -8,7 +8,10 @@ import com.bootcamp.blackbriar.model.comments.AnswerResponse;
 import com.bootcamp.blackbriar.model.comments.CommentRequest;
 import com.bootcamp.blackbriar.model.comments.FeedbackEntity;
 import com.bootcamp.blackbriar.model.comments.FeedbackResponse;
+import com.bootcamp.blackbriar.model.comments.ReviewRequest;
+import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.service.forum.CommentService;
+import com.bootcamp.blackbriar.service.inbox.InboxService;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,9 @@ public class CommentController {
   @Autowired
   private CommentService commentService;
 
+  @Autowired
+  private InboxService inboxService;
+
   @GetMapping(value = "api/forums/{forumId}/answers")
   public List<AnswerResponse> getForumComments(@PathVariable long forumId, Principal auth) {
     return commentService.getAnswers(forumId, auth.getName());
@@ -33,16 +39,38 @@ public class CommentController {
     @RequestBody CommentRequest answerData,
     Principal auth
   ) {
-    return commentService.insertAnswer(forumId, answerData, auth.getName());
+    AnswerEntity answer = commentService.insertAnswer(forumId, answerData, auth.getName());
+    ForumEntity forum = answer.getForum();
+    String studentName = answer.getStudent().getMember().getStudent().getFirstName() + " " +
+      answer.getStudent().getMember().getStudent().getLastName();
+
+    inboxService.sendMessage(
+      forum.getGroup().getOwner().getUserId(),
+      forum.getId(),
+      "Your forum '" + forum.getTitle() + "' has a new answer sent by '" + studentName  + ".'",
+      "FMNWA"
+    );
+
+    return modelMapper.map(answer, AnswerResponse.class);
   }
 
   @PutMapping(value = "api/answers/{answerId}/review")
   public AnswerResponse reviewAnswer(
     @PathVariable long answerId,
-    @RequestParam(defaultValue = "true") boolean approve,
+    @RequestBody ReviewRequest review,
     Principal auth
   ) {
-    AnswerEntity reviewed = commentService.reviewAnswer(answerId, approve, auth.getName());
+    boolean approved = review.isApproved();
+    String instructorMessage = review.getReason();
+    AnswerEntity reviewed = commentService.reviewAnswer(answerId, approved, auth.getName());
+    ForumEntity forum = reviewed.getForum();
+    
+    inboxService.sendMessage(
+      auth.getName(),
+      forum.getId(),
+      "Your answer in forum '" + forum.getTitle() + "' has been " + (approved ? "approved" : "rejected") + (instructorMessage != null ? " for the following reason: '" + instructorMessage + ".'" : "."),
+      "FMARW"
+    );
 
     return modelMapper.map(reviewed, AnswerResponse.class);
   }
@@ -61,10 +89,20 @@ public class CommentController {
   @PutMapping(value = "api/feedback/{feedbackId}/review")
   public FeedbackResponse reviewReply(
     @PathVariable long feedbackId,
-    @RequestParam(defaultValue = "true") boolean approve,
+    @RequestBody ReviewRequest review,
     Principal auth
   ) {
-    FeedbackEntity reviewed = commentService.reviewFeedback(feedbackId, approve, auth.getName());
+    boolean approved = review.isApproved();
+    String instructorMessage = review.getReason();
+    FeedbackEntity reviewed = commentService.reviewFeedback(feedbackId, approved, auth.getName());
+    ForumEntity forum = reviewed.getParent().getForum();
+
+    inboxService.sendMessage(
+      auth.getName(),
+      forum.getId(),
+      "Your reply in forum '" + forum.getTitle() + "' has been " + (approved ? "approved" : "rejected") + (instructorMessage != null ? " for the following reason: '" + instructorMessage + ".'" : "."),
+      "FMFRW"
+    );
     
     return modelMapper.map(reviewed, FeedbackResponse.class);
   }

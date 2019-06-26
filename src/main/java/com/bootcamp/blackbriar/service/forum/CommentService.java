@@ -7,6 +7,7 @@ import com.bootcamp.blackbriar.repository.AnswerRepository;
 import com.bootcamp.blackbriar.repository.FMembershipRepository;
 import com.bootcamp.blackbriar.repository.FeedbackRepository;
 import com.bootcamp.blackbriar.repository.ForumRepository;
+import com.bootcamp.blackbriar.service.inbox.InboxService;
 
 import java.lang.reflect.Type;
 import org.modelmapper.ModelMapper;
@@ -24,6 +25,9 @@ import javax.persistence.EntityNotFoundException;
 @Service
 public class CommentService {
   @Autowired
+  private InboxService inboxService;
+
+  @Autowired
   private FMembershipRepository fmembershipRepository;
 
   @Autowired
@@ -38,7 +42,7 @@ public class CommentService {
   @Autowired
   private ModelMapper modelMapper;
 
-  public AnswerResponse insertAnswer(long forumId, CommentRequest answerData, String userId) {
+  public AnswerEntity insertAnswer(long forumId, CommentRequest answerData, String userId) {
     ForumEntity forum = forumRepository.findById(forumId)
       .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
     FMembershipEntity student = fmembershipRepository.findByMemberStudentUserIdAndForumId(userId, forumId)
@@ -57,10 +61,8 @@ public class CommentService {
     created.setForum(forum);
     created.setStudent(student);
     created.setContent(answerData.getContent());
-
-    created = answerRepository.save(created);
     
-    return modelMapper.map(created, AnswerResponse.class);
+    return answerRepository.save(created);
   }
 
   public List<AnswerResponse> getAnswers(long forumId, String userId) {
@@ -175,5 +177,16 @@ public class CommentService {
     }
 
     feedbackRepository.deleteById(feedbackId);
+
+    FMembershipEntity student = feedback.getStudent();
+
+    if (student != null) {
+      inboxService.sendMessage(
+        student.getMember().getStudent().getUserId(),
+        null,
+        "One of your replies in forum '" + student.getForum().getTitle() + "' has been deleted by the instructor.",
+        "GNRIC"
+      );
+    }
   }
 }
