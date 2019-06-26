@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 public class AnswerResponse {
   private long id;
   private String content;
+  private String files;
   private Boolean approved;
   private UserRest studentDetails;
   private Date created;
@@ -74,5 +75,13 @@ public class AnswerResponse {
 
   public void setUpdated(Date updated) {
     this.updated = updated;
+  }
+
+  public String getFiles() {
+    return files;
+  }
+
+  public void setFiles(String files) {
+    this.files = files;
   }
 }

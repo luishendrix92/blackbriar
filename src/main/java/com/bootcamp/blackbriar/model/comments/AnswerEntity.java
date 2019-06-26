@@ -33,6 +33,9 @@ public class AnswerEntity implements Serializable {
   @Type(type = "text")
   private String content;
 
+  @Column(nullable = true, length = 2000)
+  private String files;
+
   @CreationTimestamp
   @Temporal(TemporalType.TIMESTAMP)
   private Date created;
@@ -124,5 +127,13 @@ public class AnswerEntity implements Serializable {
 
   public void setStudent(FMembershipEntity student) {
     this.student = student;
+  }
+
+  public String getFiles() {
+    return files;
+  }
+
+  public void setFiles(String files) {
+    this.files = files;
   }
 }

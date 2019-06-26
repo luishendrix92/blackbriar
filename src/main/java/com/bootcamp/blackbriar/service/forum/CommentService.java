@@ -61,6 +61,7 @@ public class CommentService {
     created.setForum(forum);
     created.setStudent(student);
     created.setContent(answerData.getContent());
+    created.setFiles(answerData.getFiles());
     
     return answerRepository.save(created);
   }
@@ -145,6 +146,7 @@ public class CommentService {
 
     feedback.setContent(data.getContent());
     feedback.setParent(answer);
+    feedback.setFiles(data.getFiles());
 
     return feedbackRepository.save(feedback);
   }
