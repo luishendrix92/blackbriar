@@ -12,6 +12,7 @@ public class FeedbackResponse {
   private long id;
   private long parentId;
   private String content;
+  private String files;
   private boolean approved;
   private UserRest studentDetails;
   private UserRest instructorDetails;
@@ -92,5 +93,13 @@ public class FeedbackResponse {
 
   public long getParentId() {
     return parentId;
+  }
+
+  public String getFiles() {
+    return files;
+  }
+
+  public void setFiles(String files) {
+    this.files = files;
   }
 }
