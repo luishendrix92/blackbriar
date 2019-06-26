@@ -119,6 +119,18 @@ public class CommentService {
       throw new RuntimeException("You already rejected this answer.");
     }
 
+    ForumEntity forum = forumRepository.findById(toReview.getForum().getId())
+    .orElseThrow(() -> new EntityNotFoundException("This forum does not exist."));
+
+    if(fmembershipRepository.getWarriorCount(forum.getId()) < forum.getSettings().getWarriorLimit()){
+      FMembershipEntity membershipForum = fmembershipRepository.findByMemberStudentUserIdAndForumId(userId, forum.getId())
+      .orElseThrow(() -> new EntityNotFoundException("This member does not exist."));
+
+      membershipForum.setWarrior(true);
+
+      membershipForum = fmembershipRepository.save(membershipForum);
+    }
+
     toReview.setApproved(willApprove);
     
     return answerRepository.save(toReview);

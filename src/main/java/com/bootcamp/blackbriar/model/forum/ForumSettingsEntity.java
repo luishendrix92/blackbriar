@@ -37,6 +37,9 @@ public class ForumSettingsEntity implements Serializable {
   @Column(nullable = false)
   private int validResponsePoints;
 
+  @Column(nullable = true)
+  private int warriorLimit = 0;
+
   /**
    * One to One Relationship: [ForumSettings]<-[Forum]
    * =================================================
@@ -110,5 +113,13 @@ public class ForumSettingsEntity implements Serializable {
 
   public void setForum(ForumEntity forum) {
     this.forum = forum;
+  }
+
+  public int getWarriorLimit() {
+    return warriorLimit;
+  }
+
+  public void setWarriorLimit(int warriorLimit) {
+    this.warriorLimit = warriorLimit;
   }
 }

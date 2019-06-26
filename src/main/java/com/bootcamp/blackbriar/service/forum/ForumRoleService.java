@@ -6,8 +6,10 @@ import java.util.stream.Collectors;
 
 import com.bootcamp.blackbriar.model.forum.FMembershipEntity;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
+import com.bootcamp.blackbriar.model.forum.ForumSettingsEntity;
 import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.repository.FMembershipRepository;
+import com.bootcamp.blackbriar.repository.ForumSettingsRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,36 +19,37 @@ public class ForumRoleService {
   @Autowired
   private FMembershipRepository roleRepository;
 
+  @Autowired
+  private ForumSettingsRepository forumSettingsRepository;
+
   public List<FMembershipEntity> initMembership(ForumEntity forum) {
     List<MembershipEntity> forumGroupMembers = forum.getGroup().getMembers();
-    List<FMembershipEntity> forumMembers = forumGroupMembers.stream()
-      .filter(groupMember -> groupMember.isActive())
-      .map(activeMember -> new FMembershipEntity(activeMember, forum))
-      .collect(Collectors.toList());
-    
-    assignRoles(forumMembers, forumGroupMembers.size());
-    
+    List<FMembershipEntity> forumMembers = forumGroupMembers.stream().filter(groupMember -> groupMember.isActive())
+        .map(activeMember -> new FMembershipEntity(activeMember, forum)).collect(Collectors.toList());
+
+    assignRoles(forumMembers, forumGroupMembers.size(), forum);
+
     return (List<FMembershipEntity>) roleRepository.saveAll(forumMembers);
   }
 
-  private void assignRoles(List<FMembershipEntity> forumMembers, int memberCount) {
-    int healerCount  = (int) Math.ceil(memberCount * 0.30);
+  private void assignRoles(List<FMembershipEntity> forumMembers, int memberCount, ForumEntity forum) {
+    int healerCount = (int) Math.ceil(memberCount * 0.30);
     int warriorCount = (int) Math.ceil(memberCount * 0.20);
     int warlockCount = (int) Math.floor(memberCount * 0.20);
 
     warlockCount = warlockCount > 0 ? warlockCount : 1;
 
-    actionAtRandom(
-      forumMembers,
-      forumMember -> forumMember.setHealer(true),
-      healerCount
-    );
+    actionAtRandom(forumMembers, forumMember -> forumMember.setHealer(true), healerCount);
 
-    actionAtRandom(
+    ForumSettingsEntity forumSettings = forum.getSettings();
+    forumSettings.setWarriorLimit(warriorCount);
+
+    forumSettingsRepository.save(forumSettings);
+   /* actionAtRandom(
       forumMembers,
       forumMember -> forumMember.setWarrior(true),
       warriorCount
-    );
+    );*/
 
     actionAtRandom(
       forumMembers,
