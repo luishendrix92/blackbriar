@@ -84,7 +84,7 @@ public class ForumEntity implements Serializable {
    * A forum may have answers (comments) made by
    * students with or without replies.
    */
-  @OneToMany(mappedBy = "forum")
+  @OneToMany(mappedBy = "forum", fetch = FetchType.LAZY)
   private List<AnswerEntity> answers = new ArrayList<AnswerEntity>();
 
   public long getId() {
