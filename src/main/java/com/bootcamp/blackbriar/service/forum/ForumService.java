@@ -1,15 +1,21 @@
 package com.bootcamp.blackbriar.service.forum;
 
+import com.bootcamp.blackbriar.model.comments.AnswerEntity;
+import com.bootcamp.blackbriar.model.comments.FeedbackEntity;
 import com.bootcamp.blackbriar.model.forum.FMembershipEntity;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumRequest;
 import com.bootcamp.blackbriar.model.forum.ForumSettingsEntity;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
+import com.bootcamp.blackbriar.repository.AnswerRepository;
+import com.bootcamp.blackbriar.repository.FMembershipRepository;
+import com.bootcamp.blackbriar.repository.FeedbackRepository;
 import com.bootcamp.blackbriar.repository.ForumRepository;
 import com.bootcamp.blackbriar.repository.ForumSettingsRepository;
 import com.bootcamp.blackbriar.repository.GroupRepository;
 import com.bootcamp.blackbriar.service.inbox.InboxService;
 
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +35,15 @@ public class ForumService {
 
   @Autowired
   private ForumSettingsRepository settingsRepository;
+
+  @Autowired
+  private FMembershipRepository fMembershipRepository;
+
+  @Autowired
+  private AnswerRepository answerRepository;
+
+  @Autowired
+  private FeedbackRepository feedbackRepository;
 
   @Autowired
   private ForumRoleService roleService;
@@ -134,21 +149,11 @@ public class ForumService {
   private List<FMembershipEntity> init(ForumEntity forum) {
     List<FMembershipEntity> members = roleService.initMembership(forum);
     ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-    long warlockAlertDelay = forum.getSettings().getEndDate().getTime() -
+    long forumEndDelay = forum.getSettings().getEndDate().getTime() -
       TimeUnit.HOURS.toMillis(24) -
       new Date().getTime();
 
-    ses.schedule(() -> {
-      for (FMembershipEntity member : members) {
-        inboxService.sendMessage(
-          member.getMember().getStudent().getUserId(),
-          forum.getId(),
-          member.getForum().getTitle(),
-          "FMWLK"
-        );
-      }
-    }, warlockAlertDelay, TimeUnit.MILLISECONDS);
-
+    ses.schedule(oneDayLeft(members), forumEndDelay, TimeUnit.MILLISECONDS);
     ses.shutdown();
 
     for (FMembershipEntity member : members) {
@@ -161,5 +166,48 @@ public class ForumService {
     }
 
     return members;
+  }
+
+  private Runnable oneDayLeft(List<FMembershipEntity> forumMembers) {
+    return () -> {
+      System.out.println(forumMembers.size() + " members");
+      
+      for (FMembershipEntity member : forumMembers) {
+        AnswerEntity studentAnswer = answerRepository
+          .findByStudentId(member.getId()).orElse(null);
+        boolean hasValidResponse = studentAnswer != null
+          && studentAnswer.getApproved() == Boolean.TRUE;
+        String alertCategory = null;
+        String message = null;
+
+        if (studentAnswer == null) {
+          alertCategory = "FMWLK";
+          message = "The forum '" + member.getForum().getTitle() + "' is about to end and you haven't responded yet. You don't want to be the Warlock, do you?";
+        } else {
+          List<FeedbackEntity> replies = feedbackRepository.findByStudentId(member.getId());
+
+          System.out.println(replies.size());
+
+          if (hasValidResponse && replies.size() <= 0) {
+            alertCategory = "FMHLA";
+            message = "The forum '" + member.getForum().getTitle() + "' is about to end and you haven't given any feedback yet. Don't miss the chance to be a Healer!";
+          } else if (replies.stream().anyMatch(reply -> reply.isApproved())) {
+            alertCategory = "FMHLI";
+            message = "The forum '" + member.getForum().getTitle() + "' is about to end. Remember, only the first healer to reply to an answer will be taken in to consideration to increase points. However, not everyone is a healer!";
+          }
+        }
+
+        if (alertCategory != null) {
+          inboxService.sendMessage(
+            member.getMember().getStudent().getUserId(),
+            member.getForum().getId(),
+            message,
+            alertCategory
+          );
+
+          System.out.println(alertCategory + " | " + message);
+        }
+      }
+    };
   }
 }
