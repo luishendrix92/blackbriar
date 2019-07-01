@@ -21,6 +21,6 @@ public interface AnswerRepository extends CrudRepository<AnswerEntity, Long> {
 
   List<AnswerEntity> findByForumIdAndApproved(long forumId, boolean approved);
 
-  @Query("SELECT COUNT(A.id) FROM Answer A JOIN A.replies F WHERE A.forum.id = ?1 AND A.student.healer = true AND F.approved = true GROUP BY A.id")
+  @Query("SELECT COUNT(A.id) FROM Answer A JOIN A.replies F WHERE A.forum.id = ?1 AND F.student.healer = true AND F.approved = true GROUP BY A.id")
   List<Long> validHealerAmount(long forumId);
 }
