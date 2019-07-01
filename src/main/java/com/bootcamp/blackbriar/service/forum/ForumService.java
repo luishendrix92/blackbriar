@@ -158,6 +158,8 @@ public class ForumService {
       throw new RuntimeException("You can't finish this forum yet, try once the end date has been reached.");
     }
 
+    // TODO: Add new validation: forum has no unreviewed answers
+
     int healerCount = answerRepository.validHealerAmount(forumId).size();
     int warlockCount = fmRepository.warlockAmount(forumId).intValue();
 
