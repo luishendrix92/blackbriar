@@ -15,7 +15,6 @@ import com.bootcamp.blackbriar.repository.ForumSettingsRepository;
 import com.bootcamp.blackbriar.repository.GroupRepository;
 import com.bootcamp.blackbriar.service.inbox.InboxService;
 
-import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,7 @@ public class ForumService {
   private ForumSettingsRepository settingsRepository;
 
   @Autowired
-  private FMembershipRepository fMembershipRepository;
+  private FMembershipRepository fmRepository;
 
   @Autowired
   private AnswerRepository answerRepository;
@@ -146,6 +145,43 @@ public class ForumService {
     return forumRepository.save(forum);
   }
 
+  public ForumEntity endForum(long forumId, String instructorId) {
+    ForumEntity forum = forumRepository.findById(forumId)
+      .orElseThrow(() -> new RuntimeException("Forum not found."));
+    List<FMembershipEntity> members = forum.getScoreboard();
+    int healerPoints = forum.getSettings().getHealerPoints();
+    int warlockPoints = forum.getSettings().getWarlockPoints();
+
+    if (!forum.getGroup().getOwner().getUserId().equals(instructorId)) {
+      throw new RuntimeException("Only the instructor can finish this forum.");
+    } else if (new Date().getTime() < forum.getSettings().getEndDate().getTime()) {
+      throw new RuntimeException("You can't finish this forum yet, try once the end date has been reached.");
+    }
+
+    int healerCount = answerRepository.validHealerAmount(forumId).size();
+    int warlockCount = fmRepository.warlockAmount(forumId).intValue();
+
+    for (FMembershipEntity member : members) {
+      member.setScore(
+        member.getScore() +
+        (healerCount * healerPoints) -
+        (warlockCount * warlockPoints)
+      );
+
+      inboxService.sendMessage(
+        member.getMember().getStudent().getUserId(),
+        forum.getId(),
+        "The forum '" + forum.getTitle() + "' has been finished by the instructor! Your final score is " + member.getScore() + " points." + (member.isHealer() ? " You were a healer." : "") + (member.isWarlock() ? " You were a warlock!" : "") + (member.isWarrior() ? " Congratulations, warrior!" : ""),
+        "FMSCR"
+      );
+    }
+
+    fmRepository.saveAll(members);
+    forum.setScoreboard(members);
+
+    return forum;
+  }
+
   private List<FMembershipEntity> init(ForumEntity forum) {
     List<FMembershipEntity> members = roleService.initMembership(forum);
     ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
@@ -180,13 +216,12 @@ public class ForumService {
         String alertCategory = null;
         String message = null;
 
+        // TODO: Check for missing replies
         if (studentAnswer == null) {
           alertCategory = "FMWLK";
           message = "The forum '" + member.getForum().getTitle() + "' is about to end and you haven't responded yet. You don't want to be the Warlock, do you?";
         } else {
           List<FeedbackEntity> replies = feedbackRepository.findByStudentId(member.getId());
-
-          System.out.println(replies.size());
 
           if (hasValidResponse && replies.size() <= 0) {
             alertCategory = "FMHLA";
@@ -204,8 +239,6 @@ public class ForumService {
             message,
             alertCategory
           );
-
-          System.out.println(alertCategory + " | " + message);
         }
       }
     };

@@ -66,6 +66,13 @@ public class ForumController {
     return modelMapper.map(startedForum, ForumResponse.class);
   }
 
+  @PutMapping(value = "/api/forums/{forumId}/finish")
+  public ForumResponse finishActivity(@PathVariable long forumId, Principal auth) {
+    ForumEntity finishedForum = forumService.endForum(forumId, auth.getName());
+
+    return modelMapper.map(finishedForum, ForumResponse.class);
+  }
+
   @DeleteMapping(value = "/api/forums/{forumId}")
   public void delete(@PathVariable long forumId, Principal auth) {
     forumService.removeForum(forumId, auth.getName());
