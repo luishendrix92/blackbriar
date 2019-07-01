@@ -1,8 +1,10 @@
 package com.bootcamp.blackbriar.service.forum;
 
+import com.amazonaws.services.ecs.model.Setting;
 import com.bootcamp.blackbriar.model.comments.*;
 import com.bootcamp.blackbriar.model.forum.FMembershipEntity;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
+import com.bootcamp.blackbriar.model.forum.ForumSettingsEntity;
 import com.bootcamp.blackbriar.repository.AnswerRepository;
 import com.bootcamp.blackbriar.repository.FMembershipRepository;
 import com.bootcamp.blackbriar.repository.FeedbackRepository;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,17 +47,16 @@ public class CommentService {
 
   public AnswerEntity insertAnswer(long forumId, CommentRequest answerData, String userId) {
     ForumEntity forum = forumRepository.findById(forumId)
-      .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
-    FMembershipEntity student = fmembershipRepository.findByMemberStudentUserIdAndForumId(userId, forumId)
-      .orElse(null);
+        .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
+    FMembershipEntity student = fmembershipRepository.findByMemberStudentUserIdAndForumId(userId, forumId).orElse(null);
 
     if (student == null || forum.getGroup().getOwner().getUserId().equals(userId)) {
       throw new EntityNotFoundException("Instructors and non-members can't answer forums.");
     }
 
-    answerRepository.findByStudentId(student.getId()).ifPresent(
-      (_answer) -> { throw new RuntimeException("You already answered this forum."); }
-    );
+    answerRepository.findByStudentId(student.getId()).ifPresent((_answer) -> {
+      throw new RuntimeException("You already answered this forum.");
+    });
 
     AnswerEntity created = new AnswerEntity();
 
@@ -62,9 +64,35 @@ public class CommentService {
     created.setStudent(student);
     created.setContent(answerData.getContent());
     created.setFiles(answerData.getFiles());
-    
+
     return answerRepository.save(created);
   }
+
+  public AnswerEntity editAnswer(long answerId, CommentRequest answerData, String userId) {
+    AnswerEntity answer = answerRepository.findById(answerId)
+        .orElseThrow(() -> new EntityNotFoundException("This anaswer does not exist."));
+    ForumEntity forum = answer.getForum();
+    FMembershipEntity student = fmembershipRepository.findByMemberStudentUserIdAndForumId(userId, forum.getId()).orElse(null);
+
+    if (student == null || forum.getGroup().getOwner().getUserId().equals(userId)) {
+      throw new EntityNotFoundException("Instructors and non-members can't answer forums.");
+    }
+
+    answerRepository.findByStudentId(student.getId()).ifPresent((_answer) -> {
+      throw new RuntimeException("You already answered this forum.");
+    });
+
+    answer.setAttempts(answer.getAttempts() + 1);
+    answer.setContent(answerData.getContent());
+    answer.setUpdated(new Date());
+    answer.setApproved(null);
+    answer.setFiles(answerData.getFiles());
+
+    
+    return answerRepository.save(answer);
+  }
+
+
 
   public List<AnswerResponse> getAnswers(long forumId, String userId) {
     ForumEntity forum = forumRepository.findById(forumId)
@@ -121,19 +149,53 @@ public class CommentService {
 
     ForumEntity forum = forumRepository.findById(toReview.getForum().getId())
     .orElseThrow(() -> new EntityNotFoundException("This forum does not exist."));
+    
+    FMembershipEntity membershipForum = fmembershipRepository.findByIdAndForumId(toReview.getStudent().getId(), forum.getId())
+    .orElseThrow(() -> new EntityNotFoundException("This member does not exist."));
+    
+    if(willApprove){
+      ForumSettingsEntity settings = forum.getSettings();
 
-    if(fmembershipRepository.getWarriorCount(forum.getId()) < forum.getSettings().getWarriorLimit()){
-      FMembershipEntity membershipForum = fmembershipRepository.findByMemberStudentUserIdAndForumId(userId, forum.getId())
-      .orElseThrow(() -> new EntityNotFoundException("This member does not exist."));
+      membershipForum = AssignPoints(toReview, settings, membershipForum);
 
-      membershipForum.setWarrior(true);
+      if(fmembershipRepository.getWarriorCount(forum.getId()) < forum.getSettings().getWarriorLimit()){
+        membershipForum.setWarrior(true);
 
+      }
       membershipForum = fmembershipRepository.save(membershipForum);
     }
-
+ 
     toReview.setApproved(willApprove);
     
     return answerRepository.save(toReview);
+  }
+
+  public FMembershipEntity AssignPoints(
+    AnswerEntity answer, 
+    ForumSettingsEntity settings,
+    FMembershipEntity member
+    ){
+      int attemps = answer.getAttempts() - 1;
+      double points = 0;
+
+      if(attemps == 0){
+       points = settings.getValidResponsePoints(); 
+      }
+
+      else if(attemps < 3){
+        points = settings.getValidResponsePoints() - (settings.getValidResponsePoints()*(attemps/10)); 
+      }
+      else if(attemps > 2 && attemps < 5){
+        points = settings.getValidResponsePoints() * 0.4;
+      }
+
+      else{
+        points = settings.getValidResponsePoints() * 0.1;
+      }
+
+      member.setScore((int) Math.ceil(points));
+
+      return member;
   }
 
   public FeedbackEntity createFeedback(CommentRequest data, long answerId, String userId) {
@@ -181,6 +243,7 @@ public class CommentService {
 
     return feedbackRepository.save(feedback);
   }
+
 
   public void deleteFeedback(long feedbackId, String userId) {
     FeedbackEntity feedback = feedbackRepository.findById(feedbackId)

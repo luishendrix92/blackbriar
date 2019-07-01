@@ -54,6 +54,28 @@ public class CommentController {
     return modelMapper.map(answer, AnswerResponse.class);
   }
 
+  @PutMapping(value = "api/answers/{anserId}/edit")
+  public AnswerResponse editAnswer(
+    @PathVariable long answerId,
+    @RequestBody CommentRequest answerData,
+    Principal auth
+  ){
+    AnswerEntity answer = commentService.editAnswer(answerId, answerData, auth.getName());
+    ForumEntity forum = answer.getForum();
+    String studentName = answer.getStudent().getMember().getStudent().getFirstName() + " " +
+      answer.getStudent().getMember().getStudent().getLastName();
+
+    inboxService.sendMessage(
+      forum.getGroup().getOwner().getUserId(),
+      forum.getId(),
+      "Your forum '" + forum.getTitle() + "' has a new answer sent by '" + studentName  + ".'",
+      "FMNWA"
+    );
+
+    return modelMapper.map(answer, AnswerResponse.class);
+
+  }
+
   @PutMapping(value = "api/answers/{answerId}/review")
   public AnswerResponse reviewAnswer(
     @PathVariable long answerId,
