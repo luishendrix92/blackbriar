@@ -31,7 +31,6 @@ public class ForumRoleService {
 
   private void assignRoles(List<FMembershipEntity> forumMembers, int memberCount) {
     int healerCount  = (int) Math.ceil(memberCount * 0.30);
-    int warriorCount = (int) Math.ceil(memberCount * 0.20);
     int warlockCount = (int) Math.floor(memberCount * 0.20);
 
     warlockCount = warlockCount > 0 ? warlockCount : 1;
@@ -44,17 +43,12 @@ public class ForumRoleService {
 
     actionAtRandom(
       forumMembers,
-      forumMember -> forumMember.setWarrior(true),
-      warriorCount
-    );
-
-    actionAtRandom(
-      forumMembers,
       forumMember -> forumMember.setWarlock(true),
       warlockCount
     );
   }
 
+  // TODO: Optimize with a dual list
   private <T> void actionAtRandom(List<T> source, Consumer<T> action, int amount) {
     int sourceCount = source.size();
     int pickedIndex;

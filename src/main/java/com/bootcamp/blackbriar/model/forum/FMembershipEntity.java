@@ -46,7 +46,7 @@ public class FMembershipEntity implements Serializable {
   )
   private AnswerEntity answer;
 
-  @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "student", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<FeedbackEntity> feedback = new ArrayList<FeedbackEntity>();
 
   @Column(nullable = false)
