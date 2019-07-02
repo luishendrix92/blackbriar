@@ -3,6 +3,7 @@ package com.bootcamp.blackbriar.service.forum;
 import com.bootcamp.blackbriar.model.comments.*;
 import com.bootcamp.blackbriar.model.forum.FMembershipEntity;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
+import com.bootcamp.blackbriar.model.forum.ForumSettingsEntity;
 import com.bootcamp.blackbriar.repository.AnswerRepository;
 import com.bootcamp.blackbriar.repository.FMembershipRepository;
 import com.bootcamp.blackbriar.repository.FeedbackRepository;
@@ -108,16 +109,35 @@ public class CommentService {
   public AnswerEntity reviewAnswer(long answerId, boolean willApprove, String userId) {
     AnswerEntity toReview = answerRepository.findById(answerId)
       .orElseThrow(() -> new EntityNotFoundException("This answer does not exist."));
+    ForumEntity forum = toReview.getForum();
     
-    if (!toReview.getForum().getGroup().getOwner().getUserId().equals(userId)) {
+    if (!forum.getGroup().getOwner().getUserId().equals(userId)) {
       throw new RuntimeException("Only the forum owner can review answers.");
-    } else if (
-      toReview.getApproved() == Boolean.TRUE &&
-      (willApprove || !willApprove)
-    ) {
+    } else if (toReview.getApproved() == Boolean.TRUE) {
       throw new RuntimeException("Approved answers can't be rejected or re-approved.");
     } else if (toReview.getApproved() == Boolean.FALSE && !willApprove) {
       throw new RuntimeException("You already rejected this answer.");
+    }
+
+    // TODO: Send this to ForumRoleService perhaps?
+    if (willApprove) {
+      ForumSettingsEntity settings = forum.getSettings();
+      FMembershipEntity forumMember = toReview.getStudent();
+
+      if (fmembershipRepository.warriorAmount(forum.getId()) < settings.getWarriorLimit()) {
+        forumMember.setWarrior(true);
+        forumMember.setScore(
+          forumMember.getScore() +
+          computeWarriorPoints(
+            forumMember.getScore(),
+            settings.getWarriorPoints(),
+            toReview.getAttempts()
+          )
+        );
+      }
+
+      forumMember.setScore(forumMember.getScore() + settings.getValidResponsePoints());
+      fmembershipRepository.save(forumMember);
     }
 
     toReview.setApproved(willApprove);
@@ -191,5 +211,43 @@ public class CommentService {
         "GNRIC"
       );
     }
+  }
+
+  public AnswerEntity editAnswer(long answerId, CommentRequest data, String userId) {
+    AnswerEntity answer = answerRepository.findById(answerId)
+      .orElseThrow(() -> new EntityNotFoundException("This answer does not exist."));
+    
+    if (!answer.getStudent().getMember().getStudent().getUserId().equals(userId)) {
+      throw new RuntimeException("Only the author of the answer can edit it.");
+    } else if (answer.getApproved() == Boolean.TRUE) {
+      throw new RuntimeException("You can't edit an approved answer.");
+    }
+
+    answer.setAttempts(
+      answer.getAttempts() +
+      (answer.getApproved() == Boolean.FALSE ? 1 : 0)
+    );
+    answer.setApproved(null);
+    answer.setFiles(data.getFiles());
+    answer.setContent(data.getContent());
+
+    return answerRepository.save(answer);
+  }
+
+  private int computeWarriorPoints(int score, int points, int attempts) {
+    int rejections = attempts - 1;
+    double warriorPoints = 0;
+
+    if (rejections == 0) {
+      warriorPoints = points;
+    } else if (rejections < 3) {
+      warriorPoints = points - (points * (rejections / 10));
+    } else if (rejections > 2 && rejections < 5) {
+      warriorPoints = points * 0.4;
+    } else {
+      warriorPoints = points * 0.1;
+    }
+
+    return (int) Math.ceil(warriorPoints);
   }
 }

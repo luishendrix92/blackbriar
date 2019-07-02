@@ -10,6 +10,7 @@ import com.bootcamp.blackbriar.model.comments.FeedbackEntity;
 import com.bootcamp.blackbriar.model.comments.FeedbackResponse;
 import com.bootcamp.blackbriar.model.comments.ReviewRequest;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
+import com.bootcamp.blackbriar.model.user.UserEntity;
 import com.bootcamp.blackbriar.service.forum.CommentService;
 import com.bootcamp.blackbriar.service.inbox.InboxService;
 
@@ -63,14 +64,24 @@ public class CommentController {
     boolean approved = review.isApproved();
     String instructorMessage = review.getReason();
     AnswerEntity reviewed = commentService.reviewAnswer(answerId, approved, auth.getName());
+    String studentId = reviewed.getStudent().getMember().getStudent().getUserId();
     ForumEntity forum = reviewed.getForum();
     
     inboxService.sendMessage(
-      auth.getName(),
+      studentId,
       forum.getId(),
       "Your answer in forum '" + forum.getTitle() + "' has been " + (approved ? "approved" : "rejected") + (instructorMessage != null ? " for the following reason: '" + instructorMessage + ".'" : "."),
       "FMARW"
     );
+
+    if (reviewed.getApproved() == Boolean.TRUE) {
+      inboxService.sendMessage(
+        studentId,
+        forum.getId(),
+        "Congratulations! Since you have been one of the first students to answer to '" + forum.getTitle() + "', you have become a Warrior. Be the first to reply to other students' answers... You could be a Healer too!",
+        "FMWAL"
+      );
+    }
 
     return modelMapper.map(reviewed, AnswerResponse.class);
   }
@@ -95,10 +106,11 @@ public class CommentController {
     boolean approved = review.isApproved();
     String instructorMessage = review.getReason();
     FeedbackEntity reviewed = commentService.reviewFeedback(feedbackId, approved, auth.getName());
+    String studentId = reviewed.getStudent().getMember().getStudent().getUserId();
     ForumEntity forum = reviewed.getParent().getForum();
 
     inboxService.sendMessage(
-      auth.getName(),
+      studentId,
       forum.getId(),
       "Your reply in forum '" + forum.getTitle() + "' has been " + (approved ? "approved" : "rejected") + (instructorMessage != null ? " for the following reason: '" + instructorMessage + ".'" : "."),
       "FMFRW"
@@ -110,5 +122,26 @@ public class CommentController {
   @DeleteMapping(value = "api/feedback/{feedbackId}")
   public void removeFeedback(@PathVariable long feedbackId, Principal auth) {
     commentService.deleteFeedback(feedbackId, auth.getName());
+  }
+
+  @PutMapping(value = "api/answers/{answerId}")
+  public AnswerResponse editAnswer(
+    @PathVariable long answerId,
+    @RequestBody CommentRequest data,
+    Principal auth
+  ) {
+    AnswerEntity edited = commentService.editAnswer(answerId, data, auth.getName());
+    UserEntity student = edited.getStudent().getMember().getStudent();
+    String studentName = student.getFirstName() + " " + student.getLastName();
+    ForumEntity forum = edited.getForum();
+
+    inboxService.sendMessage(
+      forum.getGroup().getOwner().getUserId(),
+      forum.getId(),
+      studentName + " edited their answer in forum '" + forum.getTitle() + "' and wants you to review it.",
+      "FMEDA"
+    );
+
+    return modelMapper.map(edited, AnswerResponse.class);
   }
 }

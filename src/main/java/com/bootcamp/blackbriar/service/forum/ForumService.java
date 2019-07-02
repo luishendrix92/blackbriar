@@ -81,6 +81,13 @@ public class ForumService {
     forum = forumRepository.save(forum);
     settings = modelMapper.map(forumDetails, ForumSettingsEntity.class);
 
+    // TODO: Move this logic to a separate SQL query
+    if (forum.isPublished()) {
+      settings.setWarriorLimit(
+        (int) Math.ceil(forum.getGroup().getMembers().size() * 0.20)
+      );
+    }
+
     settings.setForum(forum);
     settings.setStartDate(new Date());
     settingsRepository.save(settings);
@@ -221,13 +228,13 @@ public class ForumService {
         // TODO: Check for missing replies
         if (studentAnswer == null) {
           alertCategory = "FMWLK";
-          message = "The forum '" + member.getForum().getTitle() + "' is about to end and you haven't responded yet. You don't want to be the Warlock, do you?";
+          message = "The forum '" + member.getForum().getTitle() + "' is about to end and you haven't responded. You don't want to be the Warlock, do you?";
         } else {
           List<FeedbackEntity> replies = feedbackRepository.findByStudentId(member.getId());
 
           if (hasValidResponse && replies.size() <= 0) {
             alertCategory = "FMHLA";
-            message = "The forum '" + member.getForum().getTitle() + "' is about to end and you haven't given any feedback yet. Don't miss the chance to be a Healer!";
+            message = "The forum '" + member.getForum().getTitle() + "' is about to end and you haven't given any feedback. Don't miss the chance to be a Healer!";
           } else if (replies.stream().anyMatch(reply -> reply.isApproved())) {
             alertCategory = "FMHLI";
             message = "The forum '" + member.getForum().getTitle() + "' is about to end. Remember, only the first healer to reply to an answer will be taken in to consideration to increase points. However, not everyone is a healer!";

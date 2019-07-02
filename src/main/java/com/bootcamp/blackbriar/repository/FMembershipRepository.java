@@ -19,4 +19,7 @@ public interface FMembershipRepository extends CrudRepository<FMembershipEntity,
 
   @Query("SELECT COUNT(*) FROM ForumMembership M LEFT JOIN M.feedback F WHERE M.forum.id = ?1 AND M.warlock = true AND F IS NULL")
   Long warlockAmount(long forumId);
+
+  @Query("SELECT COUNT(*) FROM ForumMembership M WHERE M.warrior = true AND M.forum.id = ?1")
+  Long warriorAmount(long forumId);
 }
