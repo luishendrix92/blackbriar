@@ -108,6 +108,8 @@ public class ForumService {
       throw new RuntimeException("You are not allowed to delete forums that you didn't create.");
     }
 
+    // TODO: Notify student
+
     forumRepository.delete(toRemove);
   }
 
