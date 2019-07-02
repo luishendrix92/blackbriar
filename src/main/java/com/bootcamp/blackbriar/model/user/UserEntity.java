@@ -29,10 +29,10 @@ public class UserEntity implements Serializable {
    * available on the platform.This relationship
    * goes through an extra entity 'Membership'.
    */
-  @OneToMany(mappedBy = "student")
+  @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
   private List<MembershipEntity> studyGroups = new ArrayList<MembershipEntity>();
 
-  @OneToMany(mappedBy = "instructor")
+  @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
   private List<FeedbackEntity> feedback = new ArrayList<FeedbackEntity>();
 
   @OneToOne(

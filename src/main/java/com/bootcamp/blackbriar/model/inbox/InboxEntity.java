@@ -18,7 +18,7 @@ public class InboxEntity implements Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @OneToMany(mappedBy = "inbox")
+  @OneToMany(mappedBy = "inbox", cascade = CascadeType.ALL)
   private List<MessageEntity> messages = new ArrayList<MessageEntity>();
 
   @OneToOne(optional = false, fetch = FetchType.LAZY)

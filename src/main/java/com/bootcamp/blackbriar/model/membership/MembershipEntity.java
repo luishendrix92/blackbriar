@@ -30,7 +30,7 @@ public class MembershipEntity implements Serializable {
   @JoinColumn(name = "fk_group")
   private GroupEntity group;
 
-  @OneToMany(mappedBy = "member")
+  @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
   private List<FMembershipEntity> forums = new ArrayList<FMembershipEntity>();
 
   public long getId() {

@@ -31,7 +31,7 @@ public class GroupEntity implements Serializable {
    * Study groups can have one or more forum
    * activities listed and never shared.
    */
-  @OneToMany(mappedBy = "group")
+  @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
   private List<ForumEntity> forums = new ArrayList<ForumEntity>();
 
   /**
@@ -41,7 +41,7 @@ public class GroupEntity implements Serializable {
    * decided to join it. This relationship goes
    * through an extra entity called Membership.
    */
-  @OneToMany(mappedBy = "group")
+  @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
   private List<MembershipEntity> members = new ArrayList<MembershipEntity>();
 
   @Column(length = 100, nullable = false)

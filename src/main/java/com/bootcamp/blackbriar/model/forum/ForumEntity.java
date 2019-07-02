@@ -73,7 +73,7 @@ public class ForumEntity implements Serializable {
    * score to all active group members. This state is
    * kept in an entity called ForumMembership.
    */
-  @OneToMany(mappedBy = "forum")
+  @OneToMany(mappedBy = "forum", cascade = CascadeType.ALL)
   // @OrderBy(value = "score")
   private List<FMembershipEntity> scoreboard = new ArrayList<FMembershipEntity>();
 
@@ -83,7 +83,7 @@ public class ForumEntity implements Serializable {
    * A forum may have answers (comments) made by
    * students with or without replies.
    */
-  @OneToMany(mappedBy = "forum", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "forum", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<AnswerEntity> answers = new ArrayList<AnswerEntity>();
 
   public long getId() {
