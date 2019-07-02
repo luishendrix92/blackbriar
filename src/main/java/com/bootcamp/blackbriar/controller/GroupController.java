@@ -1,11 +1,14 @@
 package com.bootcamp.blackbriar.controller;
 
 import com.bootcamp.blackbriar.service.group.GroupService;
+import com.bootcamp.blackbriar.service.inbox.InboxService;
 import com.bootcamp.blackbriar.service.user.UserService;
 import com.bootcamp.blackbriar.model.group.GroupEntity;
 import com.bootcamp.blackbriar.model.group.GroupResponse;
+import com.bootcamp.blackbriar.model.group.GroupUpdateRequest;
 import com.bootcamp.blackbriar.model.group.InstructorGroupResponse;
 import com.bootcamp.blackbriar.model.group.StudentGroupResponse;
+import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.model.user.GroupMemberResponse;
 
 import org.modelmapper.ModelMapper;
@@ -28,6 +31,9 @@ public class GroupController {
 
   @Autowired
   ModelMapper modelMapper;
+
+  @Autowired
+  private InboxService inboxService;
 
   @GetMapping
   public List<StudentGroupResponse> searchAndExplore(Principal auth) {
@@ -65,9 +71,26 @@ public class GroupController {
     return modelMapper.map(createdGroup, InstructorGroupResponse.class);
   }
 
-  @PutMapping
-  public String updateGroup(){
-    return "update group was called";
+  @PutMapping(value = "/{groupId}")
+  public InstructorGroupResponse updateGroup(
+    @RequestBody GroupUpdateRequest groupDetails,
+    @PathVariable long groupId,
+    Principal auth
+    ){
+      GroupEntity updatedGroup = groupService.updateGroup(groupId, groupDetails, auth.getName());
+      
+      for (MembershipEntity member : updatedGroup.getMembers()) {
+        if(member.isActive()){
+          inboxService.sendMessage(
+            member.getStudent().getUserId(),
+            updatedGroup.getId(),
+            "The group '" + updatedGroup.getTitle() + "' has been updated.",
+            "GPUPD"
+          );
+        }
+      }
+        
+    return modelMapper.map(updatedGroup, InstructorGroupResponse.class);
   }
 
   @DeleteMapping
