@@ -1,11 +1,14 @@
 package com.bootcamp.blackbriar.controller;
 
 import com.bootcamp.blackbriar.service.forum.ForumService;
+import com.bootcamp.blackbriar.service.inbox.InboxService;
 
 import java.lang.reflect.Type;
 import java.security.Principal;
 
 import com.bootcamp.blackbriar.model.forum.ForumRequest;
+import com.bootcamp.blackbriar.model.forum.FMembershipEntity;
+import com.bootcamp.blackbriar.model.forum.ForumEditRequest;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumResponse;
 import com.bootcamp.blackbriar.model.forum.ForumRest;
@@ -26,6 +29,9 @@ public class ForumController {
 
   @Autowired
   ModelMapper modelMapper;
+
+  @Autowired
+  InboxService inboxService;
 
   @GetMapping(value = "/api/forums/{forumId}")
   public ForumResponse getForumDetails(@RequestParam(required = false) Boolean scoreboard, @PathVariable long forumId,
@@ -53,10 +59,35 @@ public class ForumController {
   }
 
   @PostMapping(value = "/api/groups/{groupId}/forums")
-  public ForumResponse createForum(@PathVariable long groupId, @RequestBody ForumRequest forumDetails, Principal auth) {
+  public ForumResponse createForum(
+    @PathVariable long groupId,
+    @RequestBody ForumRequest forumDetails,
+    Principal auth
+  ) {
     ForumEntity forum = forumService.createForum(groupId, forumDetails, auth.getName());
 
     return modelMapper.map(forum, ForumResponse.class);
+  }
+
+  @PutMapping(value = "/api/forums/{forumId}")
+  public ForumResponse editForum(
+    @PathVariable long forumId,
+    @RequestBody ForumEditRequest data,
+    Principal auth
+  ) {
+    ForumEntity editedForum = forumService.updateForum(forumId, data, auth.getName());
+    List<FMembershipEntity> members = editedForum.getScoreboard();
+
+    for (FMembershipEntity member : members) {
+      inboxService.sendMessage(
+        member.getMember().getStudent().getUserId(),
+        editedForum.getId(),
+        "Forum details for '" + editedForum.getTitle() + "' were updated by the instructor.",
+        "FMUPD"
+      );
+    }
+
+    return modelMapper.map(editedForum, ForumResponse.class);
   }
 
   @PutMapping(value = "/api/forums/{forumId}/publish")
