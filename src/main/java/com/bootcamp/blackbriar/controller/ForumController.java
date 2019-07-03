@@ -52,8 +52,7 @@ public class ForumController {
   @GetMapping(value = "/api/groups/{groupId}/forums")
   public List<ForumRest> listGroupForums(@PathVariable long groupId, Principal auth) {
     List<ForumEntity> groupForums = forumService.getForumsByGroup(groupId, auth.getName());
-    Type forumList = new TypeToken<List<ForumRest>>() {
-    }.getType();
+    Type forumList = new TypeToken<List<ForumRest>>() {}.getType();
 
     return modelMapper.map(groupForums, forumList);
   }

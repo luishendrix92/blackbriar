@@ -1,5 +1,7 @@
 package com.bootcamp.blackbriar.service.inbox;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import com.bootcamp.blackbriar.model.inbox.InboxEntity;
@@ -48,13 +50,40 @@ public class InboxServiceImpl implements InboxService {
   }
 
   @Override
-  public MessageEntity getLatestMessage(String userId) {
-    MessageEntity message = messageRepository
-      .findFirstByInboxSubjectUserIdAndArchivedOrderByCreatedDesc(userId, false)
-      .orElseThrow(() -> new EntityNotFoundException("User does not have a new unread message."));
-    
-    message.setArchived(true);
+  public List<MessageEntity> fetchMessages(String userId, String filter) {
+    List<MessageEntity> messages;
 
+    switch (filter) {
+      case "all":
+        messages = messageRepository
+          .findByInboxSubjectUserIdOrderByCreatedDesc(userId);
+        break;
+      case "unread":
+        messages = messageRepository
+          .findByInboxSubjectUserIdAndArchivedOrderByCreatedDesc(userId, false);
+        break;
+      case "read":
+        messages = messageRepository
+          .findByInboxSubjectUserIdAndArchivedOrderByCreatedDesc(userId, true);
+        break;
+      default:
+        throw new RuntimeException("Unrecognized filter for inbox messages.");
+    }
+
+    return messages;
+  }
+
+  @Override
+  public MessageEntity mark(long messageId, boolean read, String userId) {
+    MessageEntity message = messageRepository.findById(messageId)
+      .orElseThrow(() -> new RuntimeException("Inbox Message not found."));
+    
+    if (!message.getInbox().getSubject().getUserId().equals(userId)) {
+      throw new RuntimeException("Only the message subject can mark it as read or unread.");
+    }
+    
+    message.setArchived(read);
+    
     return messageRepository.save(message);
   }
 }

@@ -43,8 +43,7 @@ public class GroupController {
   @GetMapping(value = "/all")
   public List<GroupResponse> allGroups() {
     List<GroupEntity> groups = groupService.getAllGroups();
-    Type withOwnerData = new TypeToken<List<GroupResponse>>() {
-    }.getType();
+    Type withOwnerData = new TypeToken<List<GroupResponse>>() {}.getType();
     List<GroupResponse> serializedGroupList = modelMapper.map(groups, withOwnerData);
 
     return serializedGroupList;
