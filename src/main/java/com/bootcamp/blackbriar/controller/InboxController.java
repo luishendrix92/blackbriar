@@ -33,6 +33,11 @@ public class InboxController {
     return modelMapper.map(messages, inboxMessages);
   }
 
+  @PutMapping(value = "/api/messages/read")
+  public void readMessages(Principal auth) {
+    inboxService.readAll(auth.getName());
+  }
+
   @PutMapping(value = "/api/messages/{messageId}/mark")
   public MessageResponse markAsReadOrUnread(
     @RequestParam(required = false, defaultValue = "true") boolean read,
