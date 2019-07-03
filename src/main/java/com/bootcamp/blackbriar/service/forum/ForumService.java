@@ -3,6 +3,7 @@ package com.bootcamp.blackbriar.service.forum;
 import com.bootcamp.blackbriar.model.comments.AnswerEntity;
 import com.bootcamp.blackbriar.model.comments.FeedbackEntity;
 import com.bootcamp.blackbriar.model.forum.FMembershipEntity;
+import com.bootcamp.blackbriar.model.forum.ForumEditRequest;
 import com.bootcamp.blackbriar.model.forum.ForumEntity;
 import com.bootcamp.blackbriar.model.forum.ForumRequest;
 import com.bootcamp.blackbriar.model.forum.ForumSettingsEntity;
@@ -16,6 +17,7 @@ import com.bootcamp.blackbriar.repository.GroupRepository;
 import com.bootcamp.blackbriar.service.inbox.InboxService;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -96,6 +98,32 @@ public class ForumService {
     if (forum.isPublished()) {
       forum.setScoreboard(init(forum));
     }
+
+    return forum;
+  }
+
+  public ForumEntity updateForum(long forumId, ForumEditRequest data, String userId) {
+    ForumEntity forum = forumRepository.findById(forumId)
+      .orElseThrow(() -> new EntityNotFoundException("Forum not found."));
+    ForumSettingsEntity settings = forum.getSettings();
+    long currentTimestamp = new Date().getTime();
+    
+    if (!forum.getGroup().getOwner().getUserId().equals(userId)) {
+      throw new RuntimeException("Only the instructor can edit the forum details.");
+    } else if (currentTimestamp >= settings.getEndDate().getTime()) {
+      throw new RuntimeException("You can't edit a finished forum.");
+    } else if (data.getEndDate().getTime() <= currentTimestamp) {
+      throw new RuntimeException("End date should take place in the future.");
+    }
+
+    forum.setContent(data.getContent());
+    forum.setDescription(data.getDescription());
+
+    forum = forumRepository.save(forum);
+    
+    BeanUtils.copyProperties(data, settings);
+    settings = settingsRepository.save(settings);
+    forum.setSettings(settings);
 
     return forum;
   }
