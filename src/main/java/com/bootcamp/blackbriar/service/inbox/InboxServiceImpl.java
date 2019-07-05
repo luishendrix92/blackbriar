@@ -86,4 +86,9 @@ public class InboxServiceImpl implements InboxService {
     
     return messageRepository.save(message);
   }
+
+  @Override
+  public void readAll(String userId) {
+    messageRepository.markAllAsRead(userId);
+  }
 }

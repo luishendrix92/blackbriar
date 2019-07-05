@@ -52,7 +52,7 @@ public class GroupEntity implements Serializable {
   @Column(nullable = false)
   private String description;
 
-  @Column(length = 100, nullable = false)
+  @Column(nullable = false)
   private String image = "https://blackbriarfiles.s3.amazonaws.com/default.png";
 
   private boolean publicGroup = true;

@@ -10,4 +10,6 @@ public interface InboxService {
   MessageEntity sendMessage(String subjectId, Long actionRef, String message, String type);
 
   MessageEntity mark(long messageId, boolean read, String userId);
+
+  void readAll(String userId);
 }
