@@ -92,7 +92,7 @@ public class GroupServiceImpl implements GroupService {
     GroupEntity updatedGroup = groupRepository.findById(groupId)
       .orElseThrow(() -> new EntityNotFoundException("This group does not exist."));
 
-    if (userId.equals(updatedGroup.getOwner().getUserId())) {
+    if (!userId.equals(updatedGroup.getOwner().getUserId())) {
       throw new EntityNotFoundException("The user who wishes to update the group does not have permission.");
     }
 
