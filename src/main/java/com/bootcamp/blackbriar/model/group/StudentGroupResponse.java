@@ -1,8 +1,5 @@
 package com.bootcamp.blackbriar.model.group;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.bootcamp.blackbriar.model.membership.MembershipDetails;
 import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.model.user.UserEntity;
