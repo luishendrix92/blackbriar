@@ -2,20 +2,14 @@ package com.bootcamp.blackbriar.controller;
 
 import com.bootcamp.blackbriar.service.group.GroupService;
 import com.bootcamp.blackbriar.service.user.UserService;
-import com.bootcamp.blackbriar.model.group.GroupEntity;
-import com.bootcamp.blackbriar.model.group.InstructorGroupResponse;
-import com.bootcamp.blackbriar.model.group.StudentGroupResponse;
 import com.bootcamp.blackbriar.model.user.*;
 
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Type;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -41,22 +35,6 @@ public class UserController {
     UserEntity me = userService.getUserByPublicId(auth.getName());
 
     return modelMapper.map(me, UserProfile.class);
-  }
-
-  @GetMapping(value = "/{instructorUserId}/groups/owned")
-  public List<InstructorGroupResponse> instructorGroups(@PathVariable String instructorUserId) {
-    List<GroupEntity> groups = groupService.getInstructorGroups(instructorUserId);
-    Type withNoOwnerData = new TypeToken<List<InstructorGroupResponse>>(){}.getType();
-    List<InstructorGroupResponse> serializedGroupList = modelMapper.map(groups, withNoOwnerData);
-
-    return serializedGroupList;
-  }
-
-  @GetMapping(value = "/{studentUserId}/groups/subscribed")
-  public List<StudentGroupResponse> studentGroups(@PathVariable String studentUserId) {
-    List<StudentGroupResponse> groups = groupService.getStudentGroups(studentUserId);
-
-    return groups;
   }
 
   @PostMapping

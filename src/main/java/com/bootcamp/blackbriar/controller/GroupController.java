@@ -49,6 +49,19 @@ public class GroupController {
     return serializedGroupList;
   }
 
+  @GetMapping(value = "/owned")
+  public List<InstructorGroupResponse> instructorGroups(Principal auth) {
+    List<GroupEntity> groups = groupService.getInstructorGroups(auth.getName());
+    Type withNoOwnerData = new TypeToken<List<InstructorGroupResponse>>(){}.getType();
+
+    return modelMapper.map(groups, withNoOwnerData);
+  }
+
+  @GetMapping(value = "/subscribed")
+  public List<StudentGroupResponse> studentGroups(Principal auth) {
+    return groupService.getStudentGroups(auth.getName());
+  }
+
   @GetMapping(value = "/{groupId}/students")
   public List<GroupMemberResponse> groupMembers(@PathVariable long groupId) {
     return userService.getGroupMembers(groupId);

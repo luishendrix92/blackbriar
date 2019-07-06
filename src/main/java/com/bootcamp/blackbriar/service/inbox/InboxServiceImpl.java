@@ -89,6 +89,14 @@ public class InboxServiceImpl implements InboxService {
 
   @Override
   public void readAll(String userId) {
-    messageRepository.markAllAsRead(userId);
+    InboxEntity inbox = inboxRepository.findBySubjectUserId(userId)
+      .orElseThrow(() -> new EntityNotFoundException("User's inbox not found."));
+    List<MessageEntity> messages = inbox.getMessages();
+
+    for (MessageEntity message : messages) {
+      message.setArchived(true);
+    }
+
+    messageRepository.saveAll(messages);
   }
 }

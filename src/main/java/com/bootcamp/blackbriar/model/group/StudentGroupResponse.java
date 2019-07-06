@@ -1,5 +1,7 @@
 package com.bootcamp.blackbriar.model.group;
 
+import java.util.stream.Collectors;
+
 import com.bootcamp.blackbriar.model.membership.MembershipDetails;
 import com.bootcamp.blackbriar.model.membership.MembershipEntity;
 import com.bootcamp.blackbriar.model.user.UserEntity;
@@ -9,13 +11,14 @@ import org.springframework.beans.BeanUtils;
 
 public class StudentGroupResponse {
   private long id;
+  // FIXME: Make a membership-group merging instead of relying on the nullable MembershipEntity.
+  private int memberCount = 0;
   private String title;
   private String description;
   private String image;
   private UserRest owner;
   private boolean publicGroup = false;
   private MembershipDetails membership;
-
 
   public StudentGroupResponse(long id, String title, String description, String image, UserEntity owner, boolean publicGroup, MembershipEntity membership) {
     UserRest serializedOwner = new UserRest();
@@ -25,6 +28,10 @@ public class StudentGroupResponse {
     
     if (membership != null) {
       serializedMembership = new MembershipDetails();
+      this.memberCount = membership.getGroup().getMembers().stream()
+        .filter(member -> member.isActive())
+        .collect(Collectors.counting())
+        .intValue();
 
       BeanUtils.copyProperties(membership, serializedMembership);
     }
@@ -93,5 +100,13 @@ public class StudentGroupResponse {
 
   public void setMembership(MembershipDetails membership) {
     this.membership = membership;
+  }
+
+  public int getMemberCount() {
+    return memberCount;
+  }
+
+  public void setMemberCount(int memberCount) {
+    this.memberCount = memberCount;
   }
 }
