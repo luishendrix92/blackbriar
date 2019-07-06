@@ -171,7 +171,7 @@ public class MembershipServiceImpl implements MembershipService {
     }
 
     membershipRepository.delete(toRemove);
-    inboxService.sendMessage(toRemove.getStudent().getUserId(), null, message, "GNRIC");
+    inboxService.sendMessage(toRemove.getGroup().getOwner().getUserId(), null, message, "GNRIC");
 
     return response;
   }
