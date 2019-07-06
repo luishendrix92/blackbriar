@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InboxServiceImpl implements InboxService {
@@ -88,6 +89,7 @@ public class InboxServiceImpl implements InboxService {
   }
 
   @Override
+  @Transactional
   public void readAll(String userId) {
     messageRepository.markAllAsRead(userId);
   }
