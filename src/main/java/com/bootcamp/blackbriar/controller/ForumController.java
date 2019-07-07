@@ -39,10 +39,10 @@ public class ForumController {
     ForumEntity forum = forumService.fetchForum(forumId);
     ForumResponse response = modelMapper.map(forum, ForumResponse.class);
     boolean userIsStudent = !forum.getGroup().getOwner().getUserId().equals(auth.getName());
-    boolean forumHasNotEnded = forum.getSettings().getEndDate().getTime() > new Date().getTime();
+    boolean forumHasEnded = new Date().getTime() >= forum.getSettings().getEndDate().getTime();
     boolean hideScoreboard = scoreboard != null && !scoreboard;
 
-    if (userIsStudent && forumHasNotEnded || hideScoreboard) {
+    if (userIsStudent && !forumHasEnded || hideScoreboard) {
       response.setScoreboard(new ArrayList<>());
     }
 
@@ -99,6 +99,16 @@ public class ForumController {
   @PutMapping(value = "/api/forums/{forumId}/finish")
   public ForumResponse finishActivity(@PathVariable long forumId, Principal auth) {
     ForumEntity finishedForum = forumService.endForum(forumId, auth.getName());
+    List<FMembershipEntity> members = finishedForum.getScoreboard();
+
+    for (FMembershipEntity member : members) {
+      inboxService.sendMessage(
+        member.getMember().getStudent().getUserId(),
+        finishedForum.getId(),
+        "",
+        "FORUM_SCORES_POPUP"
+      );
+    }
 
     return modelMapper.map(finishedForum, ForumResponse.class);
   }

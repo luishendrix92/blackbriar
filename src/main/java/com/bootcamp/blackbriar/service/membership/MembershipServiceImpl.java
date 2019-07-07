@@ -84,8 +84,6 @@ public class MembershipServiceImpl implements MembershipService {
     return response;
   }
 
-  // TODO: Make a generic validation method of type (validateApproval :: long -> String -> MembershipEntity)
-  // TODO: Send a generic notification to the instructor when a user joins a public group
   @Override
   public MembershipEntity approveMembershipRequest(long membershipId, String instructorUserId) {
     MembershipEntity toApprove = membershipRepository.findById(membershipId)
