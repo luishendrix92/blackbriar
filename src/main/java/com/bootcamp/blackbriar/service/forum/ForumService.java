@@ -83,7 +83,6 @@ public class ForumService {
     forum = forumRepository.save(forum);
     settings = modelMapper.map(forumDetails, ForumSettingsEntity.class);
 
-    // TODO: Move this logic to a separate SQL query
     if (forum.isPublished()) {
       settings.setWarriorLimit(
         (int) Math.ceil(forum.getGroup().getMembers().size() * 0.20)
@@ -131,12 +130,20 @@ public class ForumService {
   public void removeForum(long forumId, String instructorId) {
     ForumEntity toRemove = forumRepository.findById(forumId)
       .orElseThrow(() -> new EntityNotFoundException("This forum activity does not exist."));
+    List<FMembershipEntity> members = toRemove.getScoreboard();
     
     if (!toRemove.getGroup().getOwner().getUserId().equals(instructorId)) {
       throw new RuntimeException("You are not allowed to delete forums that you didn't create.");
     }
 
-    // TODO: Notify student
+    for (FMembershipEntity member : members) {
+      inboxService.sendMessage(
+        member.getMember().getStudent().getUserId(),
+        null,
+        "The forum '" + toRemove.getTitle() + "' was removed by the instructor.",
+        "GNRIC"
+      );
+    }
 
     forumRepository.delete(toRemove);
   }
@@ -193,9 +200,9 @@ public class ForumService {
       throw new RuntimeException("Only the instructor can finish this forum.");
     } else if (new Date().getTime() < forum.getSettings().getEndDate().getTime()) {
       throw new RuntimeException("You can't finish this forum yet, try once the end date has been reached.");
+    } else if (forum.getAnswers().stream().anyMatch(answer -> answer.getApproved() == null)) {
+      throw new RuntimeException("This forum has answers pending of reviewal.");
     }
-
-    // TODO: Add new validation: forum has no unreviewed answers
 
     int healerCount = answerRepository.validHealerAmount(forumId).size();
     int warlockCount = fmRepository.warlockAmount(forumId).intValue();
@@ -205,13 +212,6 @@ public class ForumService {
         member.getScore() +
         (healerCount * healerPoints) -
         (warlockCount * warlockPoints)
-      );
-
-      inboxService.sendMessage(
-        member.getMember().getStudent().getUserId(),
-        forum.getId(),
-        "The forum '" + forum.getTitle() + "' has been finished by the instructor! Your final score is " + member.getScore() + " points." + (member.isHealer() ? " You were a healer." : "") + (member.isWarlock() ? " You were a warlock!" : "") + (member.isWarrior() ? " Congratulations, warrior!" : ""),
-        "FMSCR"
       );
     }
 

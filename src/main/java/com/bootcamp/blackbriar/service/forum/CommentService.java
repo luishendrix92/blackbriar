@@ -88,7 +88,6 @@ public class CommentService {
       if (existingAnswer != null && existingAnswer.getApproved() == Boolean.TRUE) {
         answers = answerRepository.findByForumIdAndApproved(forumId, true);
 
-        // TODO: Ask Product Owner if this is necessary.
         for (AnswerEntity answer : answers) {
           answer.setReplies(
             answer.getReplies().stream()
@@ -119,7 +118,6 @@ public class CommentService {
       throw new RuntimeException("You already rejected this answer.");
     }
 
-    // TODO: Send this to ForumRoleService perhaps?
     if (willApprove) {
       ForumSettingsEntity settings = forum.getSettings();
       FMembershipEntity forumMember = toReview.getStudent();
