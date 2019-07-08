@@ -112,4 +112,12 @@ public class GroupEntity implements Serializable {
   public void setMembers(List<MembershipEntity> members) {
     this.members = members;
   }
+
+  public List<ForumEntity> getForums() {
+    return forums;
+  }
+
+  public void setForums(List<ForumEntity> forums) {
+    this.forums = forums;
+  }
 }
