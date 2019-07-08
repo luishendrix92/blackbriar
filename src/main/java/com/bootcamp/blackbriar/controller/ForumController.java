@@ -105,7 +105,7 @@ public class ForumController {
       inboxService.sendMessage(
         member.getMember().getStudent().getUserId(),
         finishedForum.getId(),
-        "",
+        "Forum activity '" + finishedForum.getTitle() + "' was finalized by the instructor, you are now able to see your final score and roles.",
         "FORUM_SCORES_POPUP"
       );
     }

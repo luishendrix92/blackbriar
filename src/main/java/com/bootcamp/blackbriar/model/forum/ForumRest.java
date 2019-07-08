@@ -1,12 +1,16 @@
 package com.bootcamp.blackbriar.model.forum;
 
 import java.util.Date;
+import java.util.List;
+
+import com.bootcamp.blackbriar.model.comments.AnswerEntity;
 
 public class ForumRest {
   private long id;
   private String title;
   private String description;
   private boolean published = false;
+  private int answerCount = 0;
   private Date created;
   private ForumSettingsDetails settings;
 
@@ -56,5 +60,13 @@ public class ForumRest {
 
   public void setSettings(ForumSettingsDetails settings) {
     this.settings = settings;
+  }
+
+  public int getAnswerCont() {
+    return answerCount;
+  }
+
+  public void setAnswers(List<AnswerEntity> answers) {
+    this.answerCount = answers.size();
   }
 }
